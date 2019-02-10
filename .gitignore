@@ -1,0 +1,6 @@
+
+\.idea/
+
+tools/__pycache__/
+
+starterbots/python_starterbot/__pycache__/
