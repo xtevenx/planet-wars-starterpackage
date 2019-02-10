@@ -2,7 +2,7 @@ const Visualizer = {
     canvas: null,
     ctx: null,
     frame: 0,
-    frameSpeed: 0.06, // Speed of individual frames (original: 0.1)
+    frameSpeed: 0.08, // Speed of individual frames (original: 0.1)
     playing: false,
     haveDrawnBackground: false,
     frameDrawStarted: null,
@@ -155,7 +155,7 @@ const Visualizer = {
             ctx.arc(disp_x, this.canvas.height - disp_y, this.config.planet_pixels[planet.growthRate], 0, Math.PI * 2, true);
             ctx.closePath();
             ctx.fillStyle = color;
-            // TODO: hightlight planet when a fleet has reached them
+            // TODO: highlight planet when a fleet has reached them
             ctx.fill();
 
             ctx.fillStyle = "#ffffff";
@@ -245,6 +245,7 @@ const Visualizer = {
     drawChart: function (frame) {
         const canvas = document.getElementById('chart');
         const ctx = canvas.getContext('2d');
+        ctx.lineWidth = 1.3;
 
         // this allows us to restore scale and translate
         ctx.restore();
@@ -319,7 +320,7 @@ const Visualizer = {
 
         // draw move indicator
         if (typeof frame != "undefined") {
-            var widthFactor = canvas.width / 200;
+            var widthFactor = canvas.width / Math.max(200, this.moves.length);
             ctx.strokeStyle = "#666666";
             ctx.fillStyle = "#666666";
             ctx.beginPath();
@@ -604,7 +605,7 @@ var ParserUtils = {
 
     const updateMove = function (evt) {
         const chart = $("#chart");
-        const move = 200 * (evt.pageX - chart.offset().left) / chart.width();
+        const move = Math.max(200, Visualizer.moves.length) * (evt.pageX - chart.offset().left) / chart.width();
         Visualizer.setFrame(move);
         Visualizer.drawFrame(Visualizer.frame);
         Visualizer.stop();
@@ -635,9 +636,9 @@ var ParserUtils = {
 
     $('#error_message').text(Visualizer.error_message).css({'color': Visualizer.config.teamColor[1]});
 
-    $('.player1Name').html('<a href="profile.php?user_id=' + Visualizer.playerIds[0] + '">' + Visualizer.players[0] + '</a>');
+    // $('.player1Name').html('<a href="profile.php?user_id=' + Visualizer.playerIds[0] + '">' + Visualizer.players[0] + '</a>');
     $('.player1Name a').css({'color': Visualizer.config.teamColor[1], 'text-decoration': 'none'});
-    $('.player2Name').html('<a href="profile.php?user_id=' + Visualizer.playerIds[1] + '">' + Visualizer.players[1] + '</a>');
+    // $('.player2Name').html('<a href="profile.php?user_id=' + Visualizer.playerIds[1] + '">' + Visualizer.players[1] + '</a>');
     $('.player2Name a').css({'color': Visualizer.config.teamColor[2], 'text-decoration': 'none'});
 
     $('.playerVs').text('v.s.');
@@ -646,25 +647,3 @@ var ParserUtils = {
     Visualizer.start();
     Visualizer.drawChart();
 })(window.jQuery);
-
-/*
-     FILE ARCHIVED ON 12:19:18 Sep 03, 2011 AND RETRIEVED FROM THE
-     INTERNET ARCHIVE ON 07:47:38 Feb 09, 2019.
-     JAVASCRIPT APPENDED BY WAYBACK MACHINE, COPYRIGHT INTERNET ARCHIVE.
-
-     ALL OTHER CONTENT MAY ALSO BE PROTECTED BY COPYRIGHT (17 U.S.C.
-     SECTION 108(a)(3)).
-*/
-/*
-playback timings (ms):
-  LoadShardBlock: 107.378 (3)
-  esindex: 0.017
-  captures_list: 403.028
-  CDXLines.iter: 11.287 (3)
-  PetaboxLoader3.datanode: 173.05 (4)
-  exclusion.robots: 0.163
-  exclusion.robots.policy: 0.149
-  RedisCDXSource: 280.979
-  PetaboxLoader3.resolve: 31.42
-  load_resource: 183.264
-*/
