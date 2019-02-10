@@ -6,7 +6,7 @@ from sys import stdout
 
 
 class Fleet:
-    def __init__(self, owner, num_ships, source_planet, destination_planet, \
+    def __init__(self, owner, num_ships, source_planet, destination_planet,
                  total_trip_length, turns_remaining):
         self._owner = owner
         self._num_ships = num_ships
@@ -151,7 +151,7 @@ class PlanetWars:
                  (p.X(), p.Y(), p.Owner(), p.NumShips(), p.GrowthRate())
         for f in self._fleets:
             s += "F %d %d %d %d %d %d\n" % \
-                 (f.Owner(), f.NumShips(), f.SourcePlanet(), f.DestinationPlanet(), \
+                 (f.Owner(), f.NumShips(), f.SourcePlanet(), f.DestinationPlanet(),
                   f.TotalTripLength(), f.TurnsRemaining())
         return s
 
@@ -163,7 +163,7 @@ class PlanetWars:
         return int(ceil(sqrt(dx * dx + dy * dy)))
 
     def IssueOrder(self, source_planet, destination_planet, num_ships):
-        stdout.write("%d %d %d\n" % \
+        stdout.write("%d %d %d\n" %
                      (source_planet, destination_planet, num_ships))
         stdout.flush()
 

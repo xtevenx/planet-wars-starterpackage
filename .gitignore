@@ -4,3 +4,7 @@
 tools/__pycache__/
 
 starterbots/python_starterbot/__pycache__/
+
+visualizer/generated\.html
+
+maps/generated\.txt

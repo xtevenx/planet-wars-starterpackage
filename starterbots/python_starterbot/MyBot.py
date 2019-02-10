@@ -52,7 +52,7 @@ def DoTurn(pw):
 
 def main():
     map_data = ''
-    while (True):
+    while True:
         current_line = input()
         if len(current_line) >= 2 and current_line.startswith("go"):
             pw = PlanetWars(map_data)
@@ -64,12 +64,6 @@ def main():
 
 
 if __name__ == '__main__':
-    try:
-        import psyco
-
-        psyco.full()
-    except ImportError:
-        pass
     try:
         main()
     except KeyboardInterrupt:
