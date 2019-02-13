@@ -1,8 +1,6 @@
 import math
 import random
 
-planets = []
-
 
 def make_planet(x, y, owner, growth_rate, num_ships):
     return {"x": x, "y": y, "owner": owner, "growth_rate": growth_rate, "num_ships": num_ships}
@@ -33,7 +31,7 @@ def rand_coord():
     return (random.random() * 2.0 - 1.0) * map_radius
 
 
-def too_close(x, y, growth_rate):
+def too_close(x, y, growth_rate, planets):
     multiplier = 0.4
     for p in planets:
         dx = x - p["x"]
@@ -46,7 +44,8 @@ def too_close(x, y, growth_rate):
     return False
 
 
-def generate_map(f="maps/generated.txt"):
+def generate_map():
+    planets = list()
     planets.append(make_planet(0, 0, 0, random.randint(0, 5), random.randint(1, 150)))
     x = rand_coord()
     y = rand_coord()
@@ -59,13 +58,20 @@ def generate_map(f="maps/generated.txt"):
             y = rand_coord()
             num_ships = random.randint(1, 90)
             growth_rate = random.randint(1, 5)
-            if too_close(x, y, growth_rate):
+            if too_close(x, y, growth_rate, planets):
                 continue
             planets.append(make_planet(x, y, 0, growth_rate, num_ships))
             planets.append(make_planet(-x, -y, 0, growth_rate, num_ships))
             done = True
     fix_coordinates(planets)
-    f = open(f, "w+")
-    for p in planets:
-        f.write(print_planet(p) + "\n")
-    f.close()
+    return "\n".join(map(print_planet, planets))
+
+
+def save_map(f="generated.txt"):
+    file_object = open(f, "w+")
+    file_object.write(generate_map())
+    file_object.close()
+
+
+if __name__ == "__main__":
+    print(generate_map())

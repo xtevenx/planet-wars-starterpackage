@@ -1,8 +1,8 @@
 import os
 
-from tools import map_generator
+from tools import map_generator_v2 as map_generator
 
-map_generator.generate_map()
+map_generator.save_map("maps/generated.txt")
 
 bot1 = "python starterbots/python_starterbot/MyBot.py"
 bot2 = "java -jar example_bots/DualBot.jar"

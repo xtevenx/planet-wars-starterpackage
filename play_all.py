@@ -4,7 +4,7 @@ import subprocess
 bot1 = "python starterbots/python_starterbot/MyBot.py"
 bot2 = "java -jar example_bots/DualBot.jar"
 
-win_track_list = [0, 0]
+result_tracker_list = [0, 0]
 
 for map_number in range(100):
     command = f"java -jar tools/PlayGame-1.2.jar maps/map{map_number + 1}.txt 1000 200 \"\" \"{bot1}\" \"{bot2}\""
@@ -20,11 +20,11 @@ for map_number in range(100):
 
     output_line_as_list = output_line.split()
     if output_line_as_list[0] == "Player":
-        win_track_list[int(output_line_as_list[1]) - 1] += 1
+        result_tracker_list[int(output_line_as_list[1]) - 1] += 1
     else:
-        win_track_list[0] += 0.5
-        win_track_list[1] += 0.5
+        result_tracker_list[2] += 1
 
     process.kill()
 
-print(win_track_list)
+print(f"Player 1 win: {result_tracker_list[0]}%")
+print(f"Player 2 win: {result_tracker_list[1]}%")
