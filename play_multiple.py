@@ -11,8 +11,9 @@ NUMBER_GAMES = 1000
 result_tracker_list = [0, 0, 0]
 
 for map_number in range(NUMBER_GAMES):
-    map_generator.save_map("maps/generated.txt")
-    command = f"java -jar tools/PlayGame-1.2.jar maps/generated.txt 1000 200 \"\" \"{bot1}\" \"{bot2}\""
+    map_generator.save_map("maps/multiple{}.txt".format(map_number + 1))
+    command = "java -jar tools/PlayGame-1.2.jar maps/multiple{}.txt 1000 200 ".format(map_number + 1) + \
+              "\"\" \"{}\" \"{}\"".format(bot1, bot2)
 
     print("Map", map_number + 1, end=" --> ")
     process = subprocess.Popen(command, stdout=open(os.devnull, "w+"), stderr=subprocess.PIPE)
