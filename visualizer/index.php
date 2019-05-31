@@ -29,9 +29,9 @@
     <header>
         <table id="players">
             <tr>
-                <td width='40%' align="right" class="player1Name"></td>
-                <td width='20%' align="center" class="playerVs">Loading</td>
-                <td width='40%' align="left" class="player2Name"></td>
+                <td style="width:40%;text-align:right;" class="player1Name"></td>
+                <td style="width:20%;text-align:center;" class="playerVs">Loading</td>
+                <td style="width:40%;text-align:left;" class="player2Name"></td>
             </tr>
         </table>
     </header>
@@ -64,7 +64,7 @@
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
 <script>!window.jQuery && document.write('<script src="js/jquery-1.4.2.min.js"><\/script>')</script>
 
-<script><?php echo 'var data = "'.str_replace("\n", "\\n"). '"'; ?></script>
+<script><?php echo 'const data = "'.str_replace("\n", "\\n"). '"'; ?></script>
 
 <script src="js/visualizer.js?v=1"></script>
 </body>
