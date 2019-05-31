@@ -1,3 +1,42 @@
+const ParserUtils = {
+    parseFleet: function (data) {
+        data = data.split('.');
+        // (owner,numShips,sourcePlanet,destinationPlanet,totalTripLength,turnsRemaining)
+        return {
+            owner: parseInt(data[0]),
+            numShips: parseInt(data[1]),
+            source: Visualizer.planets[data[2]],
+            source_id: data[2],
+            destination: Visualizer.planets[data[3]],
+            destination_id: data[3],
+            tripLength: parseInt(data[4]),
+            progress: parseInt(data[4] - data[5])
+        };
+    },
+
+    parsePlanet: function (data) {
+        data = data.split(',');
+        // (x,y,owner,numShips,growthRate)
+        return {
+            x: parseFloat(data[0]),
+            y: parseFloat(data[1]),
+            owner: parseInt(data[2]),
+            numShips: parseInt(data[3]),
+            growthRate: parseInt(data[4])
+        };
+    },
+
+    parsePlanetState: function (data) {
+        data = data.split('.');
+        // (owner,numShips)
+        return {
+            owner: parseInt(data[0]),
+            numShips: parseInt(data[1])
+        };
+    },
+
+    _eof: true
+};
 const Visualizer = {
     canvas: null,
     ctx: null,
@@ -105,7 +144,9 @@ const Visualizer = {
     },
 
     drawFrame: function (frame) {
-        let disp_x = 0, disp_y = 0;
+        let color;
+        let i;
+        let display_x = 0, display_y = 0;
         const ctx = this.ctx;
         let frameNumber = Math.floor(frame);
         if (frameNumber >= this.moves.length)
@@ -121,7 +162,7 @@ const Visualizer = {
         // Draw Planets
         ctx.font = this.config.planet_font;
         ctx.textAlign = 'center';
-        for (var i = 0; i < this.planets.length; i++) {
+        for (i = 0; i < this.planets.length; i++) {
             const z = this.planetZOrder[i];
             const planet = this.planets[z];
             planet.owner = planetStats[z].owner;
@@ -135,37 +176,37 @@ const Visualizer = {
                 production[planet.owner - 1] += planet.growthRate;
             }
 
-            disp_x = this.unitToPixel(planet.x) + this.config.offset[0];
-            disp_y = this.unitToPixel(planet.y) + this.config.offset[1];
+            display_x = this.unitToPixel(planet.x) + this.config.offset[0];
+            display_y = this.unitToPixel(planet.y) + this.config.offset[1];
 
             // Add shadow
             ctx.beginPath();
-            ctx.arc(disp_x + 0.5, this.canvas.height - disp_y + 0.5, this.config.planet_pixels[planet.growthRate] + 1, 0, Math.PI * 2, true);
+            ctx.arc(display_x + 0.5, this.canvas.height - display_y + 0.5, this.config.planet_pixels[planet.growthRate] + 1, 0, Math.PI * 2, true);
             ctx.closePath();
             ctx.fillStyle = "#000000";
             ctx.fill();
 
-            var color = this.config.teamColor[planet.owner];
+            color = this.config.teamColor[planet.owner];
             if (this.active_planet >= 0 && this.active_planet == z) {
                 color = this.config.teamColor_highlight[planet.owner];
             }
 
             // Draw circle
             ctx.beginPath();
-            ctx.arc(disp_x, this.canvas.height - disp_y, this.config.planet_pixels[planet.growthRate], 0, Math.PI * 2, true);
+            ctx.arc(display_x, this.canvas.height - display_y, this.config.planet_pixels[planet.growthRate], 0, Math.PI * 2, true);
             ctx.closePath();
             ctx.fillStyle = color;
             // TODO: highlight planet when a fleet has reached them
             ctx.fill();
 
             ctx.fillStyle = "#ffffff";
-            ctx.fillText(planet.numShips, disp_x, this.canvas.height - disp_y + 5);
+            ctx.fillText(planet.numShips, display_x, this.canvas.height - display_y + 5);
 
         }
 
         // Draw Fleets
         this.ctx.font = this.config.fleet_font;
-        for (var i = 0; i < fleets.length; i++) {
+        for (i = 0; i < fleets.length; i++) {
             const fleet = fleets[i];
 
             numShips[fleet.owner - 1] += fleet.numShips;
@@ -173,10 +214,10 @@ const Visualizer = {
             const progress = (fleet.progress + 1 + (frame - frameNumber)) / (fleet.tripLength + 2);
             fleet.x = fleet.source.x + (fleet.destination.x - fleet.source.x) * progress;
             fleet.y = fleet.source.y + (fleet.destination.y - fleet.source.y) * progress;
-            disp_x = this.unitToPixel(fleet.x) + this.config.offset[0];
-            disp_y = this.unitToPixel(fleet.y) + this.config.offset[1];
+            display_x = this.unitToPixel(fleet.x) + this.config.offset[0];
+            display_y = this.unitToPixel(fleet.y) + this.config.offset[1];
 
-            var color = this.config.teamColor[fleet.owner];
+            color = this.config.teamColor[fleet.owner];
             if (this.active_planet >= 0
                 && (this.active_planet == fleet.destination_id
                     || this.active_planet == fleet.source_id)) {
@@ -187,7 +228,7 @@ const Visualizer = {
             ctx.fillStyle = color;
             ctx.beginPath();
             ctx.save();
-            ctx.translate(disp_x, this.canvas.height - disp_y);
+            ctx.translate(display_x, this.canvas.height - display_y);
 
             const scale = Math.log(Math.max(fleet.numShips, 4)) * 0.03;
             ctx.scale(scale, scale);
@@ -214,12 +255,12 @@ const Visualizer = {
             // Draw text
             if (this.config.showFleetText == true) {
                 angle = -1 * (angle + Math.PI / 2); // switch the axis around a little
-                disp_x += -11 * Math.cos(angle);
-                disp_y += -11 * Math.sin(angle) - 5;
-                ctx.fillText(fleet.numShips, disp_x, this.canvas.height - disp_y);
+                display_x += -11 * Math.cos(angle);
+                display_y += -11 * Math.sin(angle) - 5;
+                ctx.fillText(fleet.numShips, display_x, this.canvas.height - display_y);
             }
 
-            this.dirtyRegions.push([disp_x - 25, this.canvas.height - disp_y - 35, 60, 60])
+            this.dirtyRegions.push([display_x - 25, this.canvas.height - display_y - 35, 60, 60])
         }
 
         $(this.canvas).trigger('drawn');
@@ -243,6 +284,8 @@ const Visualizer = {
     },
 
     drawChart: function (frame) {
+        let j;
+        let i;
         const canvas = document.getElementById('chart');
         const ctx = canvas.getContext('2d');
         ctx.lineWidth = 1.3;
@@ -258,38 +301,38 @@ const Visualizer = {
         // Total the ship counts
         let mostShips = 100;
         let mostProduction = 5;
-        for (var i = 0; i < this.moves.length; i++) {
+        for (i = 0; i < this.moves.length; i++) {
             const turn = this.moves[i];
             turn.shipCount = [0, 0, 0];
             turn.prodCount = [0, 0, 0];
-            for (var j = 0; j < turn.moving.length; j++) {
+            for (j = 0; j < turn.moving.length; j++) {
                 const fleet = turn.moving[j];
                 turn.shipCount[fleet.owner] += fleet.numShips
             }
-            for (var j = 0; j < turn.planets.length; j++) {
+            for (j = 0; j < turn.planets.length; j++) {
                 const planet = turn.planets[j];
                 turn.shipCount[planet.owner] += planet.numShips;
                 turn.prodCount[planet.owner] += this.planets[j].growthRate;
             }
 
-            for (var j = 0; j < turn.shipCount.length; j++) {
+            for (j = 0; j < turn.shipCount.length; j++) {
                 mostShips = Math.max(mostShips, turn.shipCount[j])
             }
 
-            for (var j = 0; j < turn.prodCount.length; j++) {
+            for (j = 0; j < turn.prodCount.length; j++) {
                 mostProduction = Math.max(mostProduction, turn.prodCount[j])
             }
         }
 
         // Draw production graph
-        heightFactor = canvas.height / mostProduction / 1.05;
-        widthFactor = canvas.width / Math.max(200, this.moves.length);
-        for (var i = 1; i <= 2; i++) {
+        let heightFactor = canvas.height / mostProduction / 1.05;
+        let widthFactor = canvas.width / Math.max(200, this.moves.length);
+        for (i = 1; i <= 2; i++) {
             ctx.strokeStyle = this.config.planetColor[i];
             ctx.fillStyle = this.config.planetColor[i];
             ctx.beginPath();
             ctx.moveTo(0, this.moves[0].prodCount[i] * heightFactor);
-            for (var j = 1; j < this.moves.length; j++) {
+            for (j = 1; j < this.moves.length; j++) {
                 const prodCount = this.moves[j].prodCount[i];
                 ctx.lineTo(j * widthFactor, prodCount * heightFactor)
             }
@@ -300,14 +343,14 @@ const Visualizer = {
             //ctx.fill();
         }
 
-        var heightFactor = canvas.height / mostShips / 1.05;
-        var widthFactor = canvas.width / Math.max(200, this.moves.length);
-        for (var i = 1; i <= 2; i++) {
+        heightFactor = canvas.height / mostShips / 1.05;
+        widthFactor = canvas.width / Math.max(200, this.moves.length);
+        for (i = 1; i <= 2; i++) {
             ctx.strokeStyle = this.config.teamColor[i];
             ctx.fillStyle = this.config.teamColor[i];
             ctx.beginPath();
             ctx.moveTo(0, this.moves[0].shipCount[i] * heightFactor);
-            for (var j = 1; j < this.moves.length; j++) {
+            for (j = 1; j < this.moves.length; j++) {
                 const shipCount = this.moves[j].shipCount[i];
                 ctx.lineTo(j * widthFactor, shipCount * heightFactor)
             }
@@ -320,7 +363,7 @@ const Visualizer = {
 
         // draw move indicator
         if (typeof frame != "undefined") {
-            var widthFactor = canvas.width / Math.max(200, this.moves.length);
+            widthFactor = canvas.width / Math.max(200, this.moves.length);
             ctx.strokeStyle = "#666666";
             ctx.fillStyle = "#666666";
             ctx.beginPath();
@@ -362,7 +405,7 @@ const Visualizer = {
         this.frameDrawEnded = new Date().getTime();
 
 
-        // Todo: If frameAdvance is the miniumum size (on a super fast system), then
+        // Todo: If frameAdvance is the minimum size (on a super fast system), then
         // we need to delay drawing the next frame.
         const timeToNextDraw = 1;
         setTimeout(function () {
@@ -378,12 +421,13 @@ const Visualizer = {
     },
 
     parseData: function (input) {
+        let i;
         input = input.split(/\n/);
 
-        var data;
-        if (input.length == 1) data = input[0];
+        let data;
+        if (input.length === 1) data = input[0];
         else {
-            for (var i = 0; i < input.length; i++) {
+            for (i = 0; i < input.length; i++) {
                 const value = input[i].split('=');
                 switch (value[0]) {
                     case "player_one":
@@ -411,7 +455,7 @@ const Visualizer = {
             }
         }
 
-        var data = data.split('|');
+        data = data.split('|');
 
         // planets: [(x,y,owner,numShips,growthRate)]
         this.planets = data[0].split(':').map(ParserUtils.parsePlanet);
@@ -434,7 +478,7 @@ const Visualizer = {
             return // No turns.
         }
         const turns = data[1].split(':').slice(0, -1);
-        for (var i = 0; i < turns.length; i++) {
+        for (i = 0; i < turns.length; i++) {
             const turn = turns[i].split(',');
             const move = {};
 
@@ -483,45 +527,6 @@ const Visualizer = {
     _eof: true
 };
 
-var ParserUtils = {
-    parseFleet: function (data) {
-        data = data.split('.');
-        // (owner,numShips,sourcePlanet,destinationPlanet,totalTripLength,turnsRemaining)
-        return {
-            owner: parseInt(data[0]),
-            numShips: parseInt(data[1]),
-            source: Visualizer.planets[data[2]],
-            source_id: data[2],
-            destination: Visualizer.planets[data[3]],
-            destination_id: data[3],
-            tripLength: parseInt(data[4]),
-            progress: parseInt(data[4] - data[5])
-        };
-    },
-
-    parsePlanet: function (data) {
-        data = data.split(',');
-        // (x,y,owner,numShips,growthRate)
-        return {
-            x: parseFloat(data[0]),
-            y: parseFloat(data[1]),
-            owner: parseInt(data[2]),
-            numShips: parseInt(data[3]),
-            growthRate: parseInt(data[4])
-        };
-    },
-
-    parsePlanetState: function (data) {
-        data = data.split('.');
-        // (owner,numShips)
-        return {
-            owner: parseInt(data[0]),
-            numShips: parseInt(data[1])
-        };
-    },
-
-    _eof: true
-};
 
 (function ($) {
     Visualizer.setup(data);
@@ -591,7 +596,7 @@ var ParserUtils = {
         } else if (evt.keyCode == '39') { // Right Arrow
             nextAction();
             return false;
-        } else if (evt.keyCode == '32') { // Spacebar
+        } else if (evt.keyCode == '32') { // Space bar
             playAction();
             return false;
         } else if (evt.keyCode == '40') { // Down Arrow
