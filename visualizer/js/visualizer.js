@@ -1,7 +1,7 @@
 const ParserUtils = {
     parseFleet: function (data) {
         data = data.split('.');
-        // (owner,numShips,sourcePlanet,destinationPlanet,totalTripLength,turnsRemaining)
+        // (owner, numShips, sourcePlanet, destinationPlanet, totalTripLength, turnsRemaining)
         return {
             owner: parseInt(data[0]),
             numShips: parseInt(data[1]),
@@ -16,7 +16,7 @@ const ParserUtils = {
 
     parsePlanet: function (data) {
         data = data.split(',');
-        // (x,y,owner,numShips,growthRate)
+        // (x, y, owner, numShips, growthRate)
         return {
             x: parseFloat(data[0]),
             y: parseFloat(data[1]),
@@ -28,7 +28,7 @@ const ParserUtils = {
 
     parsePlanetState: function (data) {
         data = data.split('.');
-        // (owner,numShips)
+        // (owner, numShips)
         return {
             owner: parseInt(data[0]),
             numShips: parseInt(data[1])
@@ -37,11 +37,13 @@ const ParserUtils = {
 
     _eof: true
 };
+
+
 const Visualizer = {
     canvas: null,
     ctx: null,
     frame: 0,
-    frameSpeed: 0.08, // Speed of individual frames (original: 0.1)
+    frameSpeed: 0.08,  // Speed of individual frames (original: 0.1)
     playing: false,
     haveDrawnBackground: false,
     frameDrawStarted: null,
@@ -590,7 +592,7 @@ const Visualizer = {
     $('#speeddown').click(speeddownAction);
     $('#speedup').click(speedupAction);
 
-    window.addEventListener("keydown", function(event) {
+    window.addEventListener("keydown", function (event) {
         if (event.code === "ArrowLeft") { // Left Arrow
             prevAction();
         } else if (event.code === "ArrowRight") { // Right Arrow
