@@ -94,8 +94,8 @@ const Visualizer = {
         let ranges = [max_coords.x - min_coords.x,
             max_coords.y - min_coords.y];
         let range = Math.max(ranges[0], ranges[1]);
-        this.max_coords = max_coords;
-        this.min_coords = min_coords;
+        // this.max_coords = max_coords;
+        // this.min_coords = min_coords;
 
         let display_margin = this.config.display_margin;
         let unit_to_pixel = (this.canvas.height - display_margin * 2) / range;
