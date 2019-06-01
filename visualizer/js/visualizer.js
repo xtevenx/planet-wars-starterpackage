@@ -113,7 +113,7 @@ const Visualizer = {
     },
 
     changeSpeed: function (difference) {
-        if ((this.frameSpeed > 0.06) || (difference > 0)) {
+        if ((this.frameSpeed > 0.01 + -difference) || (difference > 0)) {
             this.frameSpeed = this.frameSpeed + difference;
         }
     },
