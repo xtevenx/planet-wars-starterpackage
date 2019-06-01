@@ -43,7 +43,7 @@ const Visualizer = {
     canvas: null,
     ctx: null,
     frame: 0,
-    frameSpeed: 0.08,  // Speed of individual frames (original: 0.1)
+    frameSpeed: 0.1,
     playing: false,
     haveDrawnBackground: false,
     frameDrawStarted: null,
