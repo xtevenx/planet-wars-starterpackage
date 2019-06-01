@@ -160,6 +160,7 @@ const Visualizer = {
         const numShips = [0, 0];
         const production = [0, 0];
 
+        this.haveDrawnBackground = false;
         this.drawBackground();
 
         // Draw Planets
