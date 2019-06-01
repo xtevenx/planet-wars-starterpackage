@@ -626,7 +626,9 @@ const Visualizer = {
     };
     $("#chart").mousedown(moveAction);
 
-    $('#display').mousemove(function (evt) {
+    let display = $('#display');
+
+    display.mousemove(function (evt) {
         const display = $(this);
         const x = evt.pageX - display.offset().left;
         const y = evt.pageY - display.offset().top;
@@ -635,7 +637,7 @@ const Visualizer = {
         return false;
     });
 
-    $('#display').bind('drawn', function () {
+    display.bind('drawn', function () {
         $('#turnCounter').text('Turn: ' + Math.floor(Visualizer.frame + 1) + ' of ' + Visualizer.moves.length)
     });
 
