@@ -80,8 +80,9 @@ const Visualizer = {
         this.parseData(data);
 
         // calculate offset and range so the map is centered and fills the area
-        max_coords = {x: -999, y: -999};
-        min_coords = {x: 999, y: 999};
+        let max_coords = {x: -999, y: -999};
+        let min_coords = {x: 999, y: 999};
+        let p;
         for (let i = 0; i < this.planets.length; i++) {
             this.planetZOrder.push(i);
             p = this.planets[i];
@@ -90,14 +91,14 @@ const Visualizer = {
             if (p.y > max_coords.y) max_coords.y = p.y;
             if (p.y < min_coords.y) min_coords.y = p.y;
         }
-        ranges = [max_coords.x - min_coords.x,
+        let ranges = [max_coords.x - min_coords.x,
             max_coords.y - min_coords.y];
-        range = Math.max(ranges[0], ranges[1]);
+        let range = Math.max(ranges[0], ranges[1]);
         this.max_coords = max_coords;
         this.min_coords = min_coords;
 
-        display_margin = this.config.display_margin;
-        unit_to_pixel = (this.canvas.height - display_margin * 2) / range;
+        let display_margin = this.config.display_margin;
+        let unit_to_pixel = (this.canvas.height - display_margin * 2) / range;
         this.config.unit_to_pixel = unit_to_pixel;
         this.config.offset = [
             (-min_coords.x * unit_to_pixel) + display_margin,
@@ -127,7 +128,7 @@ const Visualizer = {
 
         // Draw background
         ctx.fillStyle = '#000000';
-        if (this.haveDrawnBackground == false) {
+        if (this.haveDrawnBackground === false) {
             ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
             this.haveDrawnBackground = true;
         }
@@ -187,7 +188,7 @@ const Visualizer = {
             ctx.fill();
 
             color = this.config.teamColor[planet.owner];
-            if (this.active_planet >= 0 && this.active_planet == z) {
+            if (this.active_planet >= 0 && this.active_planet === z) {
                 color = this.config.teamColor_highlight[planet.owner];
             }
 
@@ -253,7 +254,7 @@ const Visualizer = {
             ctx.restore();
 
             // Draw text
-            if (this.config.showFleetText == true) {
+            if (this.config.showFleetText === true) {
                 angle = -1 * (angle + Math.PI / 2); // switch the axis around a little
                 display_x += -11 * Math.cos(angle);
                 display_y += -11 * Math.sin(angle) - 5;
@@ -484,7 +485,7 @@ const Visualizer = {
 
             move.planets = turn.slice(0, this.planets.length).map(ParserUtils.parsePlanetState);
             let fleet_strings = turn.slice(this.planets.length);
-            if (fleet_strings.length == 1 && fleet_strings[0] == '') {
+            if (fleet_strings.length === 1 && fleet_strings[0] === '') {
                 fleet_strings = []
             }
             move.moving = fleet_strings.map(ParserUtils.parseFleet);
@@ -497,6 +498,7 @@ const Visualizer = {
         let new_active_planet = -1;
         x = this.pixelToUnit(x - this.config.offset[0]);
         y = this.pixelToUnit(y - this.config.offset[1]);
+        let z;
         for (let i = this.planets.length - 1; i >= 0; --i) {
             z = this.planetZOrder[i];
             const planet = this.planets[z];
@@ -509,7 +511,7 @@ const Visualizer = {
             }
         }
 
-        if (new_active_planet != this.active_planet) {
+        if (new_active_planet !== this.active_planet) {
             this.active_planet = new_active_planet;
             this.switchPlanetZOrder(new_active_planet);
             this.drawFrame(Visualizer.frame);
