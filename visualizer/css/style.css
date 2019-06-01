@@ -194,27 +194,27 @@ button {
     -ms-interpolation-mode: bicubic;
 }
 
-.ir {
-    display: block;
-    text-indent: -999em;
-    overflow: hidden;
-    background-repeat: no-repeat;
-}
+/*.ir {*/
+/*    display: block;*/
+/*    text-indent: -999em;*/
+/*    overflow: hidden;*/
+/*    background-repeat: no-repeat;*/
+/*}*/
 
-.hidden {
-    display: none;
-    visibility: hidden;
-}
+/*.hidden {*/
+/*    display: none;*/
+/*    visibility: hidden;*/
+/*}*/
 
-.visually-hidden {
-    position: absolute !important;
-    clip: rect(1px 1px 1px 1px);
-    clip: rect(1px, 1px, 1px, 1px);
-}
+/*.visually-hidden {*/
+/*    position: absolute !important;*/
+/*    clip: rect(1px 1px 1px 1px);*/
+/*    clip: rect(1px, 1px, 1px, 1px);*/
+/*}*/
 
-.invisible {
-    visibility: hidden;
-}
+/*.invisible {*/
+/*    visibility: hidden;*/
+/*}*/
 
 /*
  * Primary Styles
