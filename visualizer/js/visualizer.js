@@ -171,6 +171,7 @@ const Visualizer = {
             const planet = this.planets[z];
             planet.owner = planetStats[z].owner;
             planet.numShips = planetStats[z].numShips;
+            const highlight_this_planet = this.active_planet >= 0 && this.active_planet === z;
 
             this.shipCount[planet.owner] += planet.numShips;
             this.growthRate[planet.owner] += planet.growthRate;
@@ -191,7 +192,7 @@ const Visualizer = {
             ctx.fill();
 
             color = this.config.teamColor[planet.owner];
-            if (this.active_planet >= 0 && this.active_planet === z) {
+            if (highlight_this_planet) {
                 color = this.config.teamColor_highlight[planet.owner];
             }
 
@@ -204,7 +205,13 @@ const Visualizer = {
             ctx.fill();
 
             ctx.fillStyle = "#ffffff";
-            ctx.fillText(planet.numShips, display_x, this.canvas.height - display_y + 5);
+            if (highlight_this_planet) {
+                ctx.fillText(z, display_x, this.canvas.height - display_y - 5);
+                ctx.fillText(planet.numShips + " (+" + planet.growthRate + ")",
+                    display_x, this.canvas.height - display_y + 10);
+            } else {
+                ctx.fillText(planet.numShips, display_x, this.canvas.height - display_y + 5);
+            }
 
         }
 
