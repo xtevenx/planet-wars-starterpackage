@@ -273,16 +273,13 @@ const Visualizer = {
 
         // update status next to usernames
         $('.player1Name').html(
-            '<a href="profile.php?user_id=' + Visualizer.playerIds[0] + '">' +
-            Visualizer.players[0] + '</a><br /> (' + numShips[0] + '/' +
-            production[0] + ')');
-
+            // '<a href="profile.php?user_id=' + Visualizer.playerIds[0] + '">' +
+            '<a>' + Visualizer.players[0] + '</a><br /> (' + numShips[0] + '/' + production[0] + ')');
         $('.player1Name a').css({'color': Visualizer.config.teamColor[1], 'text-decoration': 'none'});
-        $('.player2Name').html(
-            '<a href="profile.php?user_id=' + Visualizer.playerIds[1] + '">' +
-            Visualizer.players[1] + '</a><br /> (' + numShips[1] + '/' +
-            production[1] + ')');
 
+        $('.player2Name').html(
+            // '<a href="profile.php?user_id=' + Visualizer.playerIds[1] + '">' +
+            '<a>' + Visualizer.players[1] + '</a><br /> (' + numShips[1] + '/' + production[1] + ')');
         $('.player2Name a').css({'color': Visualizer.config.teamColor[2], 'text-decoration': 'none'})
     },
 
