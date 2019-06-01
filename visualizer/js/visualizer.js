@@ -590,26 +590,24 @@ const Visualizer = {
     $('#speeddown').click(speeddownAction);
     $('#speedup').click(speedupAction);
 
-
-    $(document.documentElement).keydown(function (evt) {
-        if (evt.keyCode == '37') { // Left Arrow
+    window.addEventListener("keydown", function(event) {
+        if (event.code === "ArrowLeft") { // Left Arrow
             prevAction();
-            return false;
-        } else if (evt.keyCode == '39') { // Right Arrow
+        } else if (event.code === "ArrowRight") { // Right Arrow
             nextAction();
-            return false;
-        } else if (evt.keyCode == '32') { // Space bar
+        } else if (event.code === "Space") { // Space bar
             playAction();
-            return false;
-        } else if (evt.keyCode == '40') { // Down Arrow
+        } else if (event.code === "ArrowDown") { // Down Arrow
             speeddownAction();
-            return false;
-        } else if (evt.keyCode == '38') { // Up Arrow
+        } else if (event.code === "ArrowUp") { // Up Arrow
             speedupAction();
-            return false;
+        } else {
+            return true;
         }
-    });
-
+        event.preventDefault();
+        return false;
+    }, true);
+    
     const updateMove = function (evt) {
         const chart = $("#chart");
         const move = Math.max(200, Visualizer.moves.length) * (evt.pageX - chart.offset().left) / chart.width();
