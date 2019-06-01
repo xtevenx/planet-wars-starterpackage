@@ -10,7 +10,7 @@ const ParserUtils = {
             destination: Visualizer.planets[data[3]],
             destination_id: data[3],
             tripLength: parseInt(data[4]),
-            progress: parseInt(data[4] - data[5])
+            progress: parseInt(data[4]) - parseInt(data[5])
         };
     },
 
@@ -607,7 +607,7 @@ const Visualizer = {
         event.preventDefault();
         return false;
     }, true);
-    
+
     const updateMove = function (evt) {
         const chart = $("#chart");
         const move = Math.max(200, Visualizer.moves.length) * (evt.pageX - chart.offset().left) / chart.width();
