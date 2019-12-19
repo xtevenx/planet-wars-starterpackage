@@ -10,7 +10,7 @@
     <meta name="author" content="">
     <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;">
     <link rel="stylesheet" href="css/style.css?v=1">
-    <script src="js/modernizr-1.5.min.js"></script>
+    <script src="js/modernizr-3.5.0.js"></script>
 
 </head>
 <!--[if lt IE 7 ]>
@@ -61,8 +61,8 @@
     </footer>
 </div> <!-- end of #container -->
 
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.min.js"></script>
-<script>!window.jQuery && document.write('<script src="js/jquery-1.4.2.min.js"><\/script>')</script>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script>!window.jQuery && document.write('<script src="js/jquery-3.4.1.js"><\/script>')</script>
 
 <script><?php echo 'const data = "'.str_replace("\n", "\\n"). '"'; ?></script>
 
