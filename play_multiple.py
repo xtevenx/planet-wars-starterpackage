@@ -1,40 +1,75 @@
+import argparse
 import os
+import shlex
 import subprocess
 
-import tools.map_generator_v2 as map_generator
+import tools.play_utils
+import tools.map_generator as map_generator
+import tools.map_generator_v2
 
-bot1 = "python starterbots/python_starterbot/MyBot.py"
-bot2 = "java -jar example_bots/DualBot.jar"
+GAME_ENGINE_COMMAND = "java -jar tools/PlayGame-1.2.jar"
 
-NUMBER_GAMES = 1000
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        description="Play multiple Planet Wars games with a random maps.")
+    parser.add_argument(
+        "--old_maps", action="store_true", dest="old_maps",
+        help="whether to generate maps using the old map generator.")
+    parser.add_argument(
+        "--max_turn_time", action="store", default=1000, type=int,
+        help="maximum time (in ms) that a bot can have on its turn.", dest="max_turn_time")
+    parser.add_argument(
+        "--max_num_turns", action="store", default=200, type=int,
+        help="maximum number of turns that a game can last.", dest="max_num_turns")
+    parser.add_argument(
+        "--manual_commands", action="store_true", dest="manual_commands",
+        help="use `player_one` and `player_two` values directly instead of automatically "
+             "determining commands from the filenames.")
+    parser.add_argument(
+        "player_one", action="store", type=str, help="command to run the first bot.")
+    parser.add_argument(
+        "player_two", action="store", type=str, help="command to run the second bot.")
+    parser.add_argument(
+        "number_games", action="store", type=int, help="number of games to play.")
+    arguments = parser.parse_args()
 
-result_tracker_list = [0, 0, 0]
+    if not arguments.old_maps:
+        map_generator = tools.map_generator_v2
 
-for map_number in range(NUMBER_GAMES):
-    map_generator.save_map("maps/multiple{}.txt".format(map_number + 1))
-    command = "java -jar tools/PlayGame-1.2.jar maps/multiple{}.txt 1000 200 ".format(map_number + 1) + \
-              "\"\" \"{}\" \"{}\"".format(bot1, bot2)
-
-    print("Map", map_number + 1, end=" --> ")
-    process = subprocess.Popen(command, stdout=open(os.devnull, "w+"), stderr=subprocess.PIPE)
-
-    output_line = process.stderr.readline().decode().strip()
-    while output_line.split()[0] not in ("Player", "Draw!"):
-        output_line = process.stderr.readline().decode().strip()
-
-    print(output_line)
-
-    output_line_as_list = output_line.split()
-    if output_line_as_list[0] == "Player":
-        result_tracker_list[int(output_line_as_list[1]) - 1] += 1
+    if not arguments.manual_commands:
+        player_one = tools.play_utils.get_command(arguments.player_one)
+        player_two = tools.play_utils.get_command(arguments.player_two)
     else:
-        result_tracker_list[2] += 1
+        player_one = arguments.player_one
+        player_two = arguments.player_two
 
-    process.kill()
+    """ Play the games below! Very cool!"""
 
-to_percent_factor = 100 / NUMBER_GAMES
-result_tracker_list = tuple(map(lambda n: round(to_percent_factor * n, 2), result_tracker_list))
+    # (draw, bot one, bot two)
+    result_tracker_list = [0, 0, 0]
 
-print(f"Player 1 win: {result_tracker_list[0]}%")
-print(f"Player 2 win: {result_tracker_list[1]}%")
-print(f"Draw: {result_tracker_list[2]}%")
+    for game_number in range(arguments.number_games):
+        map_path = f"maps/multiple{game_number + 1}.txt"
+        map_generator.save_map(map_path)
+        command = "{} {} {} {} \"\" \"{}\" \"{}\"".format(
+            GAME_ENGINE_COMMAND, map_path, arguments.max_turn_time, arguments.max_num_turns,
+            player_one, player_two
+        )
+
+        result = subprocess.run(
+            shlex.split(command), stdout=open(os.devnull, "w+"), stderr=subprocess.PIPE
+        )
+
+        verdict = result.stderr.decode().strip().split("\n")[-1]
+        if verdict.count(" ") == 2:
+            result_tracker_list[int(verdict.split(" ")[1])] += 1
+        else:
+            result_tracker_list[0] += 1
+
+        print(f"Game {game_number + 1} verdict: {verdict}", end="  ")
+        print(f"(+{result_tracker_list[1]}={result_tracker_list[0]}-{result_tracker_list[2]})")
+
+    print("---")
+    print(f"  Player 1 wins: {result_tracker_list[1]}")
+    print(f"  Player 2 wins: {result_tracker_list[2]}")
+    print(f"  Draws: {result_tracker_list[0]}")
