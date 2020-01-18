@@ -13,8 +13,8 @@ Planet Wars Starter Package
 
 Note: This challenge has been over for almost a decade; why are you still looking at it?
 
-A round-up of all you need to start the 2010 Google AI Challenge Planet Wars (hereinafter Planet Wars Challenge) 
-originally run by the University of Waterloo.
+This repository contains a round-up of all you need to start the 2010 Google AI Challenge Planet Wars (hereinafter 
+Planet Wars Challenge) originally run by the University of Waterloo.
 
 Getting Started
 ---------------
@@ -30,21 +30,10 @@ Look at `SPECIFICATION.md` for the official specifications of the game.
 
 ### Playing Games
 
-Included in this starter package are three game playing scripts.
+Included in this starter package are two game playing scripts.
 
-*  `play.py` for playing an individual game from a generated map and viewing it.
-*  `play_all.py` for playing a game on all of the 100 provided maps. This is 
-    not recommended because the provided maps were generated with an outdated 
-    generator.
-*  `play_multiple.py` for playing multiple games on generated maps.
-
-To use `play.py`, edit the top of the file under the variables `bot1` and `bot2`.
-Those are the bots that are going to play against each other and are in the format of a executable command.
-
-To use `play_all.py`, edit the file the same way as you would `play.py`.
-
-To use `play_multiple.py`, edit the file the same way as you would with `play.py` but you can also edit `NUMBER_GAMES` 
-to set the number of games you want to play.
+*  `play.py` for playing an individual game from a randomly generated map and viewing it.
+*  `play_multiple.py` for playing multiple games on multiple randomly generated maps.
 
 Note on Licensing
 -----------------
