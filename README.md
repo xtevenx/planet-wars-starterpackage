@@ -39,10 +39,12 @@ Note on Licensing
 -----------------
 
 *   The files in `example_bots/`, `maps/`, `starterbots/` and `tools/` and the file `SPECIFICATION.md` were originally 
-    released under the Apache License for the Planet Wars Challenge.
+    released under the [Apache License Version 2.0](https://www.apache.org/licenses/LICENSE-2.0) for the Planet Wars 
+    Challenge.
 *   The files in `starterbots/python_starterbot/` have been edited.
-*   The files in `visualizer/` are from the Planet Wars Challenge (released under the Apache License) and have been 
-    edited.
-*   The file `visualizer/css/Hyades.jpg` is released under the Attribution-ShareAlike Version 2.5 Generic License.
-*   The remainder of the files are released under the GNU General Public License Version 3. See `LICENSE.md` for more 
-    information
+*   The files in `visualizer/` are from the Planet Wars Challenge (released under the 
+    [Apache License Version 2.0](https://www.apache.org/licenses/LICENSE-2.0)) and have been edited.
+*   The file `visualizer/css/Hyades.jpg` is released under the 
+    [Attribution-ShareAlike Version 2.5 Generic License](https://creativecommons.org/licenses/by-sa/2.5/).
+*   The remainder of the files are released under the 
+    [GNU General Public License Version 3](https://www.gnu.org/licenses/gpl-3.0.en.html).
