@@ -58,6 +58,44 @@ img:hover {
   color: #be5046;
 }
 
+.highlight .c1 {
+  color: #59626F;
+}
+
+.highlight .kn,
+.highlight .k,
+.highlight .ow,
+.highlight .bp {
+  color: #C679DD;
+  font-style: italic;
+  font-weight: normal;
+}
+
+.highlight .nn,
+.highlight .o,
+.highlight .nf,
+.highlight .p {
+  color: #A6B2C0;
+  font-weight: normal;
+}
+
+.highlight .mi,
+.highlight .mf {
+  color: #D19A66;
+}
+
+.highlight .s {
+  color: #98C379;
+}
+
+.highlight .nb {
+  color: #E06C75;
+}
+
+.highlight .se {
+  color: #D19A66;
+}
+
 .main-content pre {
   background-color: #282c34;
   border: solid 1px #282c34;
