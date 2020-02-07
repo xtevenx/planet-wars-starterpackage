@@ -1,3 +1,8 @@
+---
+button_link: https://github.com/steven-xia/planet-wars-starterpackage
+button_text: View on GitHub
+---
+
 Planet Wars Starter Package
 ===========================
 
