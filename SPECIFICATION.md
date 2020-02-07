@@ -83,10 +83,10 @@ number of turns required to make the trip from source to
 destination. The *turns remaining* is also an integer, representing
 the number of turns left from the current turn to arrive at the
 destination. Trip lengths are determined at the time of departure by
-taking the Euclidean distance to the destination $\langle \mathrm{dx},
-\mathrm{dy} \rangle$ from the source $\langle \mathrm{sx}, \mathrm{sy}
-\rangle$ and rounding up. That is, $\lceil \sqrt{(\mathrm{dx} -
-\mathrm{sx})^2 + (\mathrm{dy} - \mathrm{sy})^2} \rceil$.
+taking the Euclidean distance to the destination $$\langle \mathrm{dx},
+\mathrm{dy} \rangle$$ from the source $$\langle \mathrm{sx}, \mathrm{sy}
+\rangle$$ and rounding up. That is, $$\lceil \sqrt{(\mathrm{dx} -
+\mathrm{sx})^2 + (\mathrm{dy} - \mathrm{sy})^2} \rceil$$.
 
 File Format
 -----------
@@ -306,7 +306,7 @@ If we apply the original procedure to the above battle, we use the
 three-way rules. The two largest forces are player 1's and player
 2's. The winner must be player 1 because he has the most ships, and we
 subtract player 2's ships from player 1's to obtain the new ship
-count, $5-4 = 1$.
+count, $$5-4 = 1$$.
 
 In actuality, all three cases for one, two and three forces follow the
 same procedure. In all cases, the largest force wins, and the second
