@@ -1,3 +1,8 @@
+---
+button_link: https://steven-xia.github.io/planet-wars-starterpackage/
+button_text: Go Home
+---
+
 `file: tools/map_generator_v2.py`
 
 ```python
