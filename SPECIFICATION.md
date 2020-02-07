@@ -132,7 +132,7 @@ About the Current Maps
 
 Most maps on the server and in the starter packs were generated
 programmatically by a
-[Python script](https://steven-xia.github.io/planet-wars-starterpackage/map_generator_v2.py). 
+[Python script](https://steven-xia.github.io/planet-wars-starterpackage/map_generator_v2). 
 You may also create your own to use for testing.
 
 Turns
