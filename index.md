@@ -31,7 +31,8 @@ What you have is a bot with a very basic strategy.
 Look at the file `MyBot.*` (different file extensions depending on programming language) to understand the basic 
 strategy of the bot and how communication with the game engine works.
 
-Look at `SPECIFICATION.md` for the official specifications of the game.
+For how the game works, look at the 
+[official specifications](https://steven-xia.github.io/planet-wars-starterpackage/specification) of the game.
 
 ### Playing Games
 
