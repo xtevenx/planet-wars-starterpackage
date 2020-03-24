@@ -6,16 +6,6 @@ button_text: View on GitHub
 Planet Wars Starter Package
 ===========================
 
-**Summary:** <sub>
-[![GitHub last commit](https://img.shields.io/github/last-commit/steven-xia/planet-wars-starterpackage?logo=github)](https://github.com/steven-xia/planet-wars-starterpackage/commits/master)
-[![GitHub code size in bytes](https://img.shields.io/github/repo-size/steven-xia/planet-wars-starterpackage?logo=github)](https://github.com/steven-xia/planet-wars-starterpackage)
-[![GitHub language count](https://img.shields.io/github/languages/count/steven-xia/planet-wars-starterpackage?logo=github)](https://github.com/steven-xia/planet-wars-starterpackage)
-[![GitHub top language](https://img.shields.io/github/languages/top/steven-xia/planet-wars-starterpackage?logo=java&logoColor=red)](https://github.com/steven-xia/planet-wars-starterpackage/search?l=java)
-[![GitHub](https://img.shields.io/github/license/steven-xia/planet-wars-starterpackage?logo=open-source-initiative&logoColor=white)](https://github.com/steven-xia/planet-wars-starterpackage/blob/master/LICENSE.md)
-</sub>
-
-***
-
 Note: This challenge has been over for almost a decade; why are you still looking at it?
 
 This repository contains a round-up of all you need to start the 2010 Google AI Challenge Planet Wars (hereinafter 
