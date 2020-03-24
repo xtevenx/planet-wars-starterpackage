@@ -120,3 +120,65 @@ img:hover {
   color: #5c6370;
   float: right;
 }
+
+@keyframes fadeUp {
+  from {
+    opacity: 0;
+    transform: translatey(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translatey(0);
+  }
+}
+
+.fade-up-1 {
+  animation-name: fadeUp;
+  animation-fill-mode: both;
+  animation-duration: 1s;
+  animation-delay: 0.1s;
+}
+
+.fade-up-2 {
+  animation-name: fadeUp;
+  animation-fill-mode: both;
+  animation-duration: 1s;
+  animation-delay: 0.2s;
+}
+
+.fade-up-3 {
+  animation-name: fadeUp;
+  animation-fill-mode: both;
+  animation-duration: 1s;
+  animation-delay: 0.3s;
+}
+
+.fade-up-4 {
+  animation-name: fadeUp;
+  animation-fill-mode: both;
+  animation-duration: 1s;
+  animation-delay: 0.4s;
+}
+
+.fade-up-5 {
+  animation-name: fadeUp;
+  animation-fill-mode: both;
+  animation-duration: 1s;
+  animation-delay: 0.5s;
+}
+
+@keyframes fadeDown {
+  from {
+    opacity: 0;
+    transform: translatey(-100px);
+  }
+  to {
+    opacity: 1;
+    transform: translatey(0);
+  }
+}
+.fade-down {
+  animation-name: fadeDown;
+  animation-fill-mode: both;
+  animation-duration: 1s;
+}
