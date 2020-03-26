@@ -1,5 +1,5 @@
 ---
-button_link: https://github.com/steven-xia/planet-wars-starterpackage
+button_link: https://github.com/xtevenx/planet-wars-starterpackage
 button_text: View on GitHub
 ---
 
@@ -22,7 +22,7 @@ Look at the file `MyBot.*` (different file extensions depending on programming l
 strategy of the bot and how communication with the game engine works.
 
 For how the game works, look at the 
-[official specifications](https://steven-xia.github.io/planet-wars-starterpackage/specification) of the game.
+[official specifications](https://xtevenx.github.io/planet-wars-starterpackage/specification) of the game.
 
 ### Playing Games
 

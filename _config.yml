@@ -4,5 +4,5 @@ defaults:
   - scope:
       path: ""
     values:
-      button_link: https://steven-xia.github.io/planet-wars-starterpackage/
+      button_link: https://xtevenx.github.io/planet-wars-starterpackage/
       button_text: Go Home
