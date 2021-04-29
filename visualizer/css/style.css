@@ -82,8 +82,8 @@ input, select {
 
 body {
     font: 13px sans-serif;
-    *font-size: small;
-    /**font: x-small;*/
+    font-size: small;
+    /*font: x-small;*/
     line-height: 1.22;
 }
 
@@ -170,7 +170,7 @@ input[type="radio"] {
 
 input[type="checkbox"] {
     vertical-align: bottom;
-    *vertical-align: baseline;
+    /*vertical-align: baseline;*/
 }
 
 .ie6 input {
@@ -298,11 +298,6 @@ h1 {
 
     @page {
         margin: 0.5cm;
-    }
-
-    p, h2, h3 {
-        orphans: 3;
-        widows: 3;
     }
 
     h2, h3 {
