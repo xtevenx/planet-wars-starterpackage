@@ -1,29 +1,17 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en" class="no-js">
+
 <head>
     <meta charset="utf-8">
-    <!--[if IE]><![endif]-->
 
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
     <title></title>
     <meta name="description" content="">
     <meta name="author" content="">
     <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;">
-    <link rel="stylesheet" href="css/style.css?v=1">
+    <link rel="stylesheet" href="css/style.css">
 </head>
 
-<!--[if lt IE 7 ]>
-<body class="ie6"> <![endif]-->
-<!--[if IE 7 ]>
-<body class="ie7"> <![endif]-->
-<!--[if IE 8 ]>
-<body class="ie8"> <![endif]-->
-<!--[if IE 9 ]>
-<body class="ie9"> <![endif]-->
-<!--[if (gt IE 9)|!(IE)]><!-->
-<body> <!--<![endif]-->
-
-
+<body>
 <div id="container">
     <header>
         <table id="players">
@@ -49,15 +37,12 @@
         </p>
 
         <p>
-            <br>
-            <br>
+            <br><br>
             <canvas id="chart" width="640" height="100"></canvas>
         </p>
     </div>
 
-    <footer>
-
-    </footer>
+    <footer></footer>
 </div> <!-- end of #container -->
 
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
@@ -65,6 +50,6 @@
 
 <script><?php echo 'const data = "'.str_replace("\n", "\\n"). '"'; ?></script>
 
-<script src="js/visualizer.js?v=1"></script>
+<script src="js/visualizer.js"></script>
 </body>
 </html>
