@@ -10,9 +10,8 @@
     <meta name="author" content="">
     <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;">
     <link rel="stylesheet" href="css/style.css?v=1">
-    <script src="js/modernizr-3.5.0.js"></script>
-
 </head>
+
 <!--[if lt IE 7 ]>
 <body class="ie6"> <![endif]-->
 <!--[if IE 7 ]>
