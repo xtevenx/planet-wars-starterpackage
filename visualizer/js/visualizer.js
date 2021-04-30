@@ -429,13 +429,13 @@ const Visualizer = {
     },
 
     parseData: function (input) {
-        let i;
         input = input.split(/\n/);
 
         let data;
-        if (input.length === 1) data = input[0];
+        if (input.length === 1)
+            data = input[0];
         else {
-            for (i = 0; i < input.length; i++) {
+            for (let i = 0; i < input.length; i++) {
                 const value = input[i].split('=');
                 switch (value[0]) {
                     case "player_one":
@@ -486,7 +486,7 @@ const Visualizer = {
             return // No turns.
         }
         const turns = data[1].split(':').slice(0, -1);
-        for (i = 0; i < turns.length; i++) {
+        for (let i = 0; i < turns.length; i++) {
             const turn = turns[i].split(',');
             const move = {};
 
