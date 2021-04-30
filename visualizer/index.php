@@ -32,7 +32,7 @@
             <a href="#" id="play-button" title="Pause (space bar)">&#9654;</a> |
             <a href="#" id="next-frame-button" title="Next frame (right arrow)">&raquo;</a> |
             <a href="#" id="end-button" title="Jump to end">&raquo;<span class="small">|</span></a><br/>
-            <a href="#" id="speeddown" title="Slow down (down arrow)">-</a>
+            <a href="#" id="speeddown" title="Slow down (down arrow)">–</a>
             <a href="#" id="speedup" title="Speed up (up arrow)">+</a>
         </p>
 

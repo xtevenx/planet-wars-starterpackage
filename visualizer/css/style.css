@@ -1,17 +1,14 @@
-html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre,
-abbr, address, cite, code, del, dfn, em, img, ins, kbd, q, samp,
-small, strong, sub, sup, var, b, i, dl, dt, dd, ol, ul, li,
-fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td,
-article, aside, figure, footer, header, hgroup, menu, nav, section, menu,
-time, mark, audio, video {
+html, body, div, span, object, iframe, h1, h2, h3, h4, h5, h6, p, blockquote, pre, abbr, address,
+cite, code, del, dfn, em, img, ins, kbd, q, samp, small, strong, sub, sup, var, b, i, dl, dt, dd,
+ol, ul, li, fieldset, form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, figure, footer, header, hgroup, menu, nav, section, menu, time, mark, audio,
+video {
     margin: 0;
     padding: 0;
     border: 0;
     outline: 0;
     font-size: 100%;
     vertical-align: baseline;
-    /* WHOLE PAGE BACKGROUND */
-    /* WHOLE PAGE BACKGROUND */
     background: #000000 url("Hyades.jpg");
 }
 
@@ -28,7 +25,6 @@ blockquote, q {
 }
 
 blockquote:before, blockquote:after, q:before, q:after {
-    /*content: '';*/
     content: none;
 }
 
@@ -101,7 +97,7 @@ pre, code, kbd, samp {
 }
 
 body, select, input, textarea {
-    color: #9b9b9b; /* TURN COUNTER FONT */
+    color: #9b9b9b;
 }
 
 h1, h2, h3, h4, h5, h6 {
@@ -173,10 +169,6 @@ input[type="checkbox"] {
     /*vertical-align: baseline;*/
 }
 
-.ie6 input {
-    vertical-align: text-bottom;
-}
-
 label, input[type=button], input[type=submit], button {
     cursor: pointer;
 }
@@ -188,10 +180,6 @@ a:link {
 button {
     width: auto;
     overflow: visible;
-}
-
-.ie7 img {
-    -ms-interpolation-mode: bicubic;
 }
 
 /*.ir {*/
@@ -253,15 +241,13 @@ h1 {
 }
 
 #chart {
-    background: #000000; /* SHIPS/POPULATION CHART BACKGROUND */
-    /*background-image: url("Hyades.jpg.jpg"); !* SHIPS/POPULATION CHART BACKGROUND *!*/
+    background: #000000;
+    /*background-image: url("Hyades.jpg");*/
     border-top: solid 1px #607890;
     border-bottom: solid 1px #607890;
 }
 
-/* 
- * print styles
- */
+/* Print Styles */
 @media print {
     * {
         background: transparent !important;
@@ -303,15 +289,6 @@ h1 {
     h2, h3 {
         page-break-after: avoid;
     }
-}
-
-
-@media all and (orientation: portrait) {
-
-}
-
-@media all and (orientation: landscape) {
-
 }
 
 /* Grade-A Mobile Browsers */
