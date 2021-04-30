@@ -6,12 +6,11 @@ import webbrowser
 def generate(data, save_path):
     path = os.path.dirname(__file__)
     template_path = os.path.join(path, "index.php")
-    template = open(template_path, "r")
-    content = template.read()
-    template.close()
+    with open(template_path, "r") as template:
+        content = template.read()
 
-    php_re = re.compile(r"<\?php.*?\?>", re.S)
-    javascript = "var data = '%s';" % data
+    php_re = re.compile(r"<\?php\?>", re.S)
+    javascript = "const data = '%s';" % data
     content = php_re.sub(javascript, content)
 
     output = open(save_path, "w+")
