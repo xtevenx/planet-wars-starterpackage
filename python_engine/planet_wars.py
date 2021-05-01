@@ -11,12 +11,16 @@ class Planet:
         self.num_ships: int = num_ships
         self.growth_rate: int = growth_rate
 
-    def info(self) -> str:
+    def output_info(self) -> str:
         return "{},{},{},{},{}".format(
             self.x, self.y, self.owner, self.num_ships, self.growth_rate)
 
-    def state(self) -> str:
+    def output_state(self) -> str:
         return "{}.{}".format(self.owner, self.num_ships)
+
+    def game_state(self) -> str:
+        return "P {} {} {} {} {}".format(
+            self.x, self.y, self.owner, self.num_ships, self.growth_rate)
 
 
 class Fleet:
@@ -29,8 +33,13 @@ class Fleet:
         self.total_trip_length: int = total_trip_length
         self.turns_remaining: int = turns_remaining
 
-    def info(self) -> str:
+    def output_state(self) -> str:
         return "{}.{}.{}.{}.{}.{}".format(
+            self.owner, self.num_ships, self.source_planet, self.destination_planet,
+            self.total_trip_length, self.turns_remaining)
+
+    def game_state(self) -> str:
+        return "F {} {} {} {} {} {}".format(
             self.owner, self.num_ships, self.source_planet, self.destination_planet,
             self.total_trip_length, self.turns_remaining)
 
@@ -42,7 +51,7 @@ class PlanetWars:
 
         self._parse_state(state_string.strip())
 
-        self._initial_state: str = ":".join(p.info() for p in self._planet_list)
+        self._initial_state: str = ":".join(p.output_info() for p in self._planet_list)
         self._turns_list: list[str] = []
 
         self._move_table: list[list] = [[0 for _ in self._planet_list] for _ in self._planet_list]
@@ -143,8 +152,8 @@ class PlanetWars:
                     )
 
     def _update_output(self) -> None:
-        planet_string: str = ",".join(p.state() for p in self._planet_list)
-        fleet_string: str = ",".join(f.info() for f in self._fleet_list)
+        planet_string: str = ",".join(p.output_state() for p in self._planet_list)
+        fleet_string: str = ",".join(f.output_state() for f in self._fleet_list)
         self._turns_list.append(",".join((planet_string, fleet_string)))
 
     def get_output(self) -> str:
@@ -169,3 +178,8 @@ class PlanetWars:
         self._move_table[source_id][destination_id] += num_ships
         source_planet.num_ships -= num_ships
         return True
+
+    def get_state(self) -> str:
+        planet_string: str = "\n".join(p.game_state() for p in self._planet_list)
+        fleet_string: str = "\n".join(f.game_state() for f in self._fleet_list)
+        return "\n".join((planet_string, fleet_string))
