@@ -39,6 +39,9 @@ class PlanetWars:
 
         self._parse_state(state_string.strip())
 
+        self._initial_state: str = ":".join(p.info() for p in self._planet_list)
+        self._turns_list: list[str] = []
+
     def _parse_state(self, state_string: str) -> None:
         items = state_string.split("\n")
         for item in items:
@@ -78,7 +81,42 @@ class PlanetWars:
         )
 
     def simulate_turn(self) -> None:
-        ...
+        ships_count: list[list[int, int, int]] = [[0, 0, 0] for _ in self._planet_list]
+
+        # update `ships_count` with planets' ships
+        for i, planet in enumerate(self._planet_list):
+            planet.num_ships += planet.growth_rate * (planet.owner != 0)
+            ships_count[i][planet.owner] = planet.num_ships
+
+        # update fleet distances and update `ships_count`
+        for fleet_index in range(len(self._fleet_list) - 1, -1, -1):
+            fleet = self._fleet_list[fleet_index]
+            fleet.turns_remaining -= 1
+
+            if fleet.turns_remaining == 0:
+                self._fleet_list.pop(fleet_index)
+                ships_count[fleet.destination_planet][fleet.owner] += fleet.num_ships
+
+        # do fleet planet interactions
+        for i, ships in enumerate(ships_count):
+            winner_ships = max(ships)
+
+            if ships.count(winner_ships) == 1:
+                winner_id = ships.index(winner_ships)
+                ships[winner_id] = 0
+
+                self._planet_list[i].owner = winner_id
+                self._planet_list[i].num_ships = winner_ships - max(ships)
+            else:
+                self._planet_list[i].num_ships = 0
+
+        # update the output list
+        self._update_output()
 
     def _update_output(self) -> None:
-        ...
+        planet_string: str = ",".join(p.state() for p in self._planet_list)
+        fleet_string: str = ",".join(f.info() for f in self._fleet_list)
+        self._turns_list.append(",".join((planet_string, fleet_string)))
+
+    def get_output(self) -> str:
+        return "|".join((self._initial_state, ":".join(self._turns_list)))
