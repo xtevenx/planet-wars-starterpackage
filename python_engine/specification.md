@@ -31,13 +31,15 @@ Output format
 -------------
 
 The output is split into two parts, separated by a pipe character:
-  - The first part is the information for the planets:
+  - The first part is the information for the planets. The planets are
+    separated by colons and formatted as follows:
 
     ```text
     x,y,owner,numShips,growthRate
     ```
 
-  - The second part is the information for the turns:
+  - The second part is the information for the turns. The fleets are
+    separated by colons and formatted as follows:
       - A turn has multiple values separated by commas:
           - The first `|P|` values are information for the planet states:
 
