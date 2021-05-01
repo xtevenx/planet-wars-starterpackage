@@ -1,3 +1,6 @@
+import math
+
+
 class Planet:
     def __init__(self, planet_id: int, x: float, y: float, owner: int, num_ships: int,
                  growth_rate: int) -> None:
@@ -42,6 +45,8 @@ class PlanetWars:
         self._initial_state: str = ":".join(p.info() for p in self._planet_list)
         self._turns_list: list[str] = []
 
+        self._move_table: list[list] = [[0 for _ in self._planet_list] for _ in self._planet_list]
+
     def _parse_state(self, state_string: str) -> None:
         items = state_string.split("\n")
         for item in items:
@@ -81,6 +86,11 @@ class PlanetWars:
         )
 
     def simulate_turn(self) -> None:
+        # process the accumulated moves in the move table
+        self._process_moves()
+
+        # three numbers for each planet representing the number of ships for
+        # each owner (index is owner).
         ships_count: list[list[int, int, int]] = [[0, 0, 0] for _ in self._planet_list]
 
         # update `ships_count` with planets' ships
@@ -113,6 +123,25 @@ class PlanetWars:
         # update the output list
         self._update_output()
 
+        # update moves table for next turn
+        self._move_table: list[list] = [[0 for _ in self._planet_list] for _ in self._planet_list]
+
+    def _process_moves(self) -> None:
+        for source_id, destination_list in enumerate(self._move_table):
+            for destination_id, num_ships in enumerate(destination_list):
+                if num_ships != 0:
+                    distance = self._distance(source_id, destination_id)
+                    self._fleet_list.append(
+                        Fleet(
+                            owner=self._planet_list[source_id].owner,
+                            num_ships=num_ships,
+                            source_planet=source_id,
+                            destination_planet=destination_id,
+                            total_trip_length=distance,
+                            turns_remaining=distance
+                        )
+                    )
+
     def _update_output(self) -> None:
         planet_string: str = ",".join(p.state() for p in self._planet_list)
         fleet_string: str = ",".join(f.info() for f in self._fleet_list)
@@ -120,3 +149,23 @@ class PlanetWars:
 
     def get_output(self) -> str:
         return "|".join((self._initial_state, ":".join(self._turns_list)))
+
+    def _distance(self, source_id: int, destination_id: int) -> int:
+        source_planet = self._planet_list[source_id]
+        destination_planet = self._planet_list[destination_id]
+        dx = destination_planet.x - source_planet.x
+        dy = destination_planet.y - source_planet.y
+        return math.ceil(math.sqrt(dx ** 2 + dy ** 2))
+
+    def add_fleet(self, owner: int, source_id: int, destination_id: int, num_ships: int) -> bool:
+        source_planet = self._planet_list[source_id]
+        destination_planet = self._planet_list[destination_id]
+
+        if owner != source_planet.owner or num_ships > source_planet.num_ships:
+            return False
+        if source_planet == destination_planet or num_ships == 0:
+            return True
+
+        self._move_table[source_id][destination_id] += num_ships
+        source_planet.num_ships -= num_ships
+        return True
