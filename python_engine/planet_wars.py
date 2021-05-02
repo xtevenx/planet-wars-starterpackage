@@ -167,8 +167,11 @@ class PlanetWars:
         return math.ceil(math.sqrt(dx ** 2 + dy ** 2))
 
     def add_fleet(self, owner: int, source_id: int, destination_id: int, num_ships: int) -> bool:
-        source_planet = self._planet_list[source_id]
-        destination_planet = self._planet_list[destination_id]
+        try:
+            source_planet = self._planet_list[source_id]
+            destination_planet = self._planet_list[destination_id]
+        except IndexError:
+            return False
 
         if owner != source_planet.owner or num_ships > source_planet.num_ships:
             return False
