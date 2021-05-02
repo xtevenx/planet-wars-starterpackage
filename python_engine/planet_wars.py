@@ -1,5 +1,7 @@
 import math
 
+_INVERT: dict[int, int] = {0: 0, 1: 2, 2: 1}
+
 
 class Planet:
     def __init__(self, planet_id: int, x: float, y: float, owner: int, num_ships: int,
@@ -18,7 +20,9 @@ class Planet:
     def output_state(self) -> str:
         return "{}.{}".format(self.owner, self.num_ships)
 
-    def game_state(self) -> str:
+    def game_state(self, invert: bool = False) -> str:
+        owner = _INVERT[self.owner] if invert else self.owner
+
         return "P {} {} {} {} {}".format(
             self.x, self.y, self.owner, self.num_ships, self.growth_rate)
 
@@ -38,7 +42,9 @@ class Fleet:
             self.owner, self.num_ships, self.source_planet, self.destination_planet,
             self.total_trip_length, self.turns_remaining)
 
-    def game_state(self) -> str:
+    def game_state(self, invert: bool = False) -> str:
+        owner = _INVERT[self.owner] if invert else self.owner
+
         return "F {} {} {} {} {} {}".format(
             self.owner, self.num_ships, self.source_planet, self.destination_planet,
             self.total_trip_length, self.turns_remaining)
@@ -182,7 +188,7 @@ class PlanetWars:
         source_planet.num_ships -= num_ships
         return True
 
-    def get_state(self) -> str:
-        planet_string: str = "\n".join(p.game_state() for p in self._planet_list)
-        fleet_string: str = "\n".join(f.game_state() for f in self._fleet_list)
+    def get_state(self, invert: bool = False) -> str:
+        planet_string: str = "\n".join(p.game_state(invert) for p in self._planet_list)
+        fleet_string: str = "\n".join(f.game_state(invert) for f in self._fleet_list)
         return "\n".join((planet_string, fleet_string))
