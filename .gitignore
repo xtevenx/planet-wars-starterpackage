@@ -2,6 +2,7 @@
 
 tools/__pycache__/
 starterbots/python_starterbot/__pycache__/
+*.pyc
 
 visualizer/generated\.html
 
