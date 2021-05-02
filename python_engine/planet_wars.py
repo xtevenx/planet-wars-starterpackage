@@ -177,6 +177,7 @@ class PlanetWars:
         except IndexError:
             return False
 
+        # warning: assumes num_ships >= 0 is already checked
         if owner != source_planet.owner or num_ships > source_planet.num_ships:
             return False
         if source_planet == destination_planet or num_ships == 0:
@@ -189,4 +190,4 @@ class PlanetWars:
     def get_state(self, invert: bool = False) -> str:
         planet_string: str = "\n".join(p.game_state(invert) for p in self._planet_list)
         fleet_string: str = "\n".join(f.game_state(invert) for f in self._fleet_list)
-        return "\n".join((planet_string, fleet_string))
+        return "\n".join((planet_string, fleet_string, "go\n"))
