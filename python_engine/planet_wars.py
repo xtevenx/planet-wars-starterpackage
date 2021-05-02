@@ -22,9 +22,7 @@ class Planet:
 
     def game_state(self, invert: bool = False) -> str:
         owner = _INVERT[self.owner] if invert else self.owner
-
-        return "P {} {} {} {} {}".format(
-            self.x, self.y, self.owner, self.num_ships, self.growth_rate)
+        return "P {} {} {} {} {}".format(self.x, self.y, owner, self.num_ships, self.growth_rate)
 
 
 class Fleet:
@@ -46,7 +44,7 @@ class Fleet:
         owner = _INVERT[self.owner] if invert else self.owner
 
         return "F {} {} {} {} {} {}".format(
-            self.owner, self.num_ships, self.source_planet, self.destination_planet,
+            owner, self.num_ships, self.source_planet, self.destination_planet,
             self.total_trip_length, self.turns_remaining)
 
 
