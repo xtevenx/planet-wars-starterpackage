@@ -25,14 +25,10 @@ class Player:
         else:
             self._process.kill()
 
-    def get_response(self, input_string: str, timeout: float = 1.0):
+    def get_response(self, input_string: str):
         self._process.stdin.write(input_string)
         self._process.stdin.flush()
 
-        # todo: create timeout implementation
-        return self._get_output()
-
-    def _get_output(self) -> list[str]:
         move_list: list[str] = []
         while (line := str(self._process.stdout.readline()).strip()) and line != "go":
             move_list.append(line)
