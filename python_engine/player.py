@@ -18,8 +18,8 @@ class Player:
     def __del__(self) -> None:
         self._process.terminate()
 
-        timeout_time = time.time() + KILL_TIMEOUT
-        while time.time() < timeout_time:
+        timeout_time = time.perf_counter() + KILL_TIMEOUT
+        while time.perf_counter() < timeout_time:
             if self._process.poll() is not None:
                 break
         else:
