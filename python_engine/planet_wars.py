@@ -191,3 +191,14 @@ class PlanetWars:
         planet_string: str = "\n".join(p.game_state(invert) for p in self._planet_list)
         fleet_string: str = "\n".join(f.game_state(invert) for f in self._fleet_list)
         return "\n".join((planet_string, fleet_string, "go\n"))
+
+    def get_winner(self) -> int:
+        is_alive = [0, 0, 0]
+        for p in self._planet_list:
+            is_alive[p.owner] |= 1
+        for f in self._fleet_list:
+            is_alive[f.owner] |= 1
+
+        if is_alive[1] + is_alive[2] == 1:
+            return 1 if is_alive[1] else 2
+        return 0
