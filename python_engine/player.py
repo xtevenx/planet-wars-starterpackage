@@ -15,6 +15,8 @@ class Player:
             universal_newlines=True
         )
 
+        self.last_response: list[str] = []
+
     def __del__(self) -> None:
         self._process.terminate()
 
@@ -25,11 +27,11 @@ class Player:
         else:
             self._process.kill()
 
-    def get_response(self, input_string: str):
+    def get_response(self, input_string: str) -> list[str]:
         self._process.stdin.write(input_string)
         self._process.stdin.flush()
 
-        move_list: list[str] = []
+        self.last_response = []
         while (line := str(self._process.stdout.readline()).strip()) and line != "go":
-            move_list.append(line)
-        return move_list
+            self.last_response.append(line)
+        return self.last_response
