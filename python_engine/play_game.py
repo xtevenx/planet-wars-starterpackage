@@ -9,8 +9,15 @@ MAP_PATH: str = "./generated.txt"
 P1_COMMAND: str = "python ./level2.py"
 P2_COMMAND: str = "python ./level3.py"
 
-
 MOVE_TIME: float = 1.0
+
+
+def print_finish(winner: int, reason: str = None):
+    if reason:
+        sys.stderr.write(f"{reason}\n")
+    sys.stderr.write(f"Player {winner} wins!\n")
+    sys.stderr.flush()
+
 
 if __name__ == "__main__":
     with open(MAP_PATH, "r") as fp:
@@ -46,6 +53,7 @@ if __name__ == "__main__":
             try:
                 assert pw.add_fleet(1, *(int(x) for x in move_string.split()))
             except (ValueError, TypeError, AssertionError):
+                print_finish(winner=2, reason=f"Player 1 illegal move: \"{move_string}\"")
                 illegal_move = True
                 break
         if illegal_move:
@@ -55,6 +63,7 @@ if __name__ == "__main__":
             try:
                 assert pw.add_fleet(2, *(int(x) for x in move_string.split()))
             except (ValueError, TypeError, AssertionError):
+                print_finish(winner=1, reason=f"Player 2 illegal move: \"{move_string}\"")
                 illegal_move = True
                 break
         if illegal_move:
@@ -62,12 +71,12 @@ if __name__ == "__main__":
 
         pw.simulate_turn()
 
-    # this is not strictly necessary, but the official engine does it so the
-    # viewers expect it. Or... perhaps there's a bug that I can't find. :/
-    pw.simulate_turn()
+    else:
+        print_finish(winner=pw.get_winner())
+
+        # this is not strictly necessary, but the official engine does it so the
+        # viewers expect it. Or... perhaps there's a bug that I can't find. :/
+        pw.simulate_turn()
 
     sys.stdout.write(pw.get_output())
     sys.stdout.flush()
-
-    sys.stderr.write("done.\n")
-    sys.stderr.flush()
