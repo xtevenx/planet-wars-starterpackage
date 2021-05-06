@@ -9,6 +9,7 @@ MAP_PATH: str = "./generated.txt"
 P1_COMMAND: str = "python ./level2.py"
 P2_COMMAND: str = "python ./level3.py"
 
+MAX_TURNS: int = 200
 MOVE_TIME: float = 1.0
 
 
@@ -25,7 +26,7 @@ if __name__ == "__main__":
 
     player_one = Player(P1_COMMAND)
     player_two = Player(P2_COMMAND)
-    while pw.get_winner() == 0:
+    while pw.get_winner() == 0 and pw.num_turns() <= MAX_TURNS:
         p1_input = pw.get_state()
         p2_input = pw.get_state(invert=True)
 
@@ -72,11 +73,15 @@ if __name__ == "__main__":
         pw.simulate_turn()
 
     else:
-        print_finish(winner=pw.get_winner())
-
         # this is not strictly necessary, but the official engine does it so the
         # viewers expect it. Or... perhaps there's a bug that I can't find. :/
         pw.simulate_turn()
+
+        if win_id := pw.get_winner(force=True):
+            print_finish(winner=pw.get_winner())
+        else:
+            sys.stderr.write("Draw!\n")
+            sys.stderr.flush()
 
     sys.stdout.write(pw.get_output())
     sys.stdout.flush()

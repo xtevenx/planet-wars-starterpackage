@@ -194,13 +194,27 @@ class PlanetWars:
         fleet_string: str = "\n".join(f.game_state(invert) for f in self._fleet_list)
         return "\n".join((planet_string, fleet_string, "go\n"))
 
-    def get_winner(self) -> int:
-        is_alive = [0, 0, 0]
-        for p in self._planet_list:
-            is_alive[p.owner] |= 1
-        for f in self._fleet_list:
-            is_alive[f.owner] |= 1
+    def get_winner(self, force: bool = False) -> int:
+        if force:
+            num_ships: list[int] = [0, 0, 0]
+            for p in self._planet_list:
+                num_ships[p.owner] += p.num_ships
+            for f in self._fleet_list:
+                num_ships[f.owner] += f.num_ships
 
-        if is_alive[1] + is_alive[2] == 1:
-            return 1 if is_alive[1] else 2
-        return 0
+            num_ships[0] = num_ships[1] * (num_ships[1] == num_ships[2])
+            return num_ships.index(max(num_ships))
+
+        else:
+            is_alive: list[int] = [0, 0, 0]
+            for p in self._planet_list:
+                is_alive[p.owner] |= 1
+            for f in self._fleet_list:
+                is_alive[f.owner] |= 1
+
+            if is_alive[1] + is_alive[2] == 1:
+                return 1 if is_alive[1] else 2
+            return 0
+
+    def num_turns(self) -> int:
+        return len(self._turns_list)
