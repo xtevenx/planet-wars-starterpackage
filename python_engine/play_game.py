@@ -43,12 +43,16 @@ if __name__ == "__main__":
         end_time = time.perf_counter() + MOVE_TIME
         p1_thread.join(timeout=end_time - time.perf_counter())
         if p1_thread.is_alive():
-            # todo: handle player one (possibly both players) timed out...
-            ...
+            if p2_thread.is_alive():
+                print_finish(winner=0, reason="Both players timed out.")
+            else:
+                print_finish(winner=2, reason="Player 1 timed out.")
+            break
+
         p2_thread.join(timeout=end_time - time.perf_counter())
         if p2_thread.is_alive():
-            # todo: handle player two timed out...
-            ...
+            print_finish(winner=1, reason="Player 2 timed out.")
+            break
 
         p1_moves = player_one.last_response
         p2_moves = player_two.last_response
