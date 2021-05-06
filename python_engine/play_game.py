@@ -41,13 +41,24 @@ if __name__ == "__main__":
         p1_moves = player_one.last_response
         p2_moves = player_two.last_response
 
-        p1_moves_int = [[int(x) for x in line.split()] for line in p1_moves]
-        p2_moves_int = [[int(x) for x in line.split()] for line in p2_moves]
+        illegal_move = False
+        for move_string in p1_moves:
+            try:
+                assert pw.add_fleet(1, *(int(x) for x in move_string.split()))
+            except (ValueError, TypeError, AssertionError):
+                illegal_move = True
+                break
+        if illegal_move:
+            break
 
-        for move in p1_moves_int:
-            pw.add_fleet(1, *move)
-        for move in p2_moves_int:
-            pw.add_fleet(2, *move)
+        for move_string in p2_moves:
+            try:
+                assert pw.add_fleet(2, *(int(x) for x in move_string.split()))
+            except (ValueError, TypeError, AssertionError):
+                illegal_move = True
+                break
+        if illegal_move:
+            break
 
         pw.simulate_turn()
 

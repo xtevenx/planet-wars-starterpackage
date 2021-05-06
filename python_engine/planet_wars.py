@@ -178,7 +178,9 @@ class PlanetWars:
             return False
 
         # warning: assumes num_ships >= 0 is already checked
-        if owner != source_planet.owner or num_ships > source_planet.num_ships:
+        if owner != source_planet.owner:
+            return False
+        if num_ships < 0 or num_ships > source_planet.num_ships:
             return False
         if source_planet == destination_planet or num_ships == 0:
             return True
