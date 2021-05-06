@@ -16,7 +16,11 @@ MOVE_TIME: float = 1.0
 def print_finish(winner: int, reason: str = None):
     if reason:
         sys.stderr.write(f"{reason}\n")
-    sys.stderr.write(f"Player {winner} wins!\n")
+
+    if winner:
+        sys.stderr.write(f"Player {winner} wins!\n")
+    else:
+        sys.stderr.write("Draw!\n")
     sys.stderr.flush()
 
 
@@ -77,11 +81,7 @@ if __name__ == "__main__":
         # viewers expect it. Or... perhaps there's a bug that I can't find. :/
         pw.simulate_turn()
 
-        if win_id := pw.get_winner(force=True):
-            print_finish(winner=pw.get_winner())
-        else:
-            sys.stderr.write("Draw!\n")
-            sys.stderr.flush()
+        print_finish(winner=pw.get_winner())
 
     sys.stdout.write(pw.get_output())
     sys.stdout.flush()
