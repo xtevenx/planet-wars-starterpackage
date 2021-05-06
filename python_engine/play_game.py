@@ -85,7 +85,7 @@ if __name__ == "__main__":
         # viewers expect it. Or... perhaps there's a bug that I can't find. :/
         pw.simulate_turn()
 
-        print_finish(winner=pw.get_winner())
+        print_finish(winner=pw.get_winner(force=True))
 
     sys.stdout.write(pw.get_output())
     sys.stdout.flush()
