@@ -5,13 +5,6 @@ import time
 from planet_wars import PlanetWars
 from player import Player
 
-MAP_PATH: str = "./generated.txt"
-P1_COMMAND: str = "python ./level2.py"
-P2_COMMAND: str = "python ./level3.py"
-
-MAX_TURNS: int = 200
-MOVE_TIME: float = 1.0
-
 
 def print_finish(winner: int, reason: str = None):
     if reason:
@@ -24,13 +17,13 @@ def print_finish(winner: int, reason: str = None):
     sys.stderr.flush()
 
 
-if __name__ == "__main__":
-    with open(MAP_PATH, "r") as fp:
+def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, p2_command: str):
+    with open(map_path, "r") as fp:
         pw = PlanetWars(fp.read())
 
-    player_one = Player(P1_COMMAND)
-    player_two = Player(P2_COMMAND)
-    while pw.get_winner() == 0 and pw.num_turns() <= MAX_TURNS:
+    player_one = Player(p1_command)
+    player_two = Player(p2_command)
+    while pw.get_winner() == 0 and pw.num_turns() <= max_turns:
         p1_input = pw.get_state()
         p2_input = pw.get_state(invert=True)
 
@@ -40,7 +33,7 @@ if __name__ == "__main__":
         p1_thread.start()
         p2_thread.start()
 
-        end_time = time.perf_counter() + MOVE_TIME
+        end_time = time.perf_counter() + turn_time
         p1_thread.join(timeout=end_time - time.perf_counter())
         if p1_thread.is_alive():
             if p2_thread.is_alive():
@@ -89,3 +82,13 @@ if __name__ == "__main__":
 
     sys.stdout.write(pw.get_output())
     sys.stdout.flush()
+
+
+if __name__ == "__main__":
+    play_game(
+        map_path="./generated.txt",
+        turn_time=1.0,
+        max_turns=200,
+        p1_command="python ./level2.py",
+        p2_command="python ./level3.py"
+    )
