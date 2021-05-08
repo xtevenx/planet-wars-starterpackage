@@ -6,20 +6,19 @@ from planet_wars import PlanetWars
 from player import Player
 
 
-def print_finish(winner: int, reason: str = None):
-    if reason:
-        sys.stderr.write(f"{reason}\n")
-
-    if winner:
-        sys.stderr.write(f"Player {winner} wins!\n")
-    else:
-        sys.stderr.write("Draw!\n")
-    sys.stderr.flush()
+class GameResult:
+    def __init__(self, winner: int = None, reason: str = None, output: str = None) -> None:
+        self.winner: int = winner
+        self.reason: str = reason
+        self.output: str = output
 
 
-def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, p2_command: str):
+def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, p2_command: str
+              ) -> GameResult:
     with open(map_path, "r") as fp:
         pw = PlanetWars(fp.read())
+
+    result = GameResult()
 
     player_one = Player(p1_command)
     player_two = Player(p2_command)
@@ -37,14 +36,17 @@ def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, 
         p1_thread.join(timeout=end_time - time.perf_counter())
         if p1_thread.is_alive():
             if p2_thread.is_alive():
-                print_finish(winner=0, reason="Both players timed out.")
+                result.winner = 0
+                result.reason = "Both players timed out."
             else:
-                print_finish(winner=2, reason="Player 1 timed out.")
+                result.winner = 2
+                result.reason = "Player 1 timed out."
             break
 
         p2_thread.join(timeout=end_time - time.perf_counter())
         if p2_thread.is_alive():
-            print_finish(winner=1, reason="Player 2 timed out.")
+            result.winner = 1
+            result.reason = "Player 2 timed out."
             break
 
         p1_moves = player_one.last_response
@@ -55,7 +57,8 @@ def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, 
             try:
                 assert pw.add_fleet(1, *(int(x) for x in move_string.split()))
             except (ValueError, TypeError, AssertionError):
-                print_finish(winner=2, reason=f"Player 1 illegal move: \"{move_string}\"")
+                result.winner = 2
+                result.reason = f"Player 1 illegal move: \"{move_string}\""
                 illegal_move = True
                 break
         if illegal_move:
@@ -65,7 +68,8 @@ def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, 
             try:
                 assert pw.add_fleet(2, *(int(x) for x in move_string.split()))
             except (ValueError, TypeError, AssertionError):
-                print_finish(winner=1, reason=f"Player 2 illegal move: \"{move_string}\"")
+                result.winner = 1
+                result.reason = f"Player 2 illegal move: \"{move_string}\""
                 illegal_move = True
                 break
         if illegal_move:
@@ -78,17 +82,32 @@ def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, 
         # viewers expect it. Or... perhaps there's a bug that I can't find. :/
         pw.simulate_turn()
 
-        print_finish(winner=pw.get_winner(force=True))
+        result.winner = pw.get_winner(force=True)
 
-    sys.stdout.write(pw.get_output())
-    sys.stdout.flush()
+    result.output = pw.get_output()
+    return result
+
+
+def print_finish(winner: int, reason: str = None) -> None:
+    if reason:
+        sys.stderr.write(f"{reason}\n")
+
+    if winner:
+        sys.stderr.write(f"Player {winner} wins!\n")
+    else:
+        sys.stderr.write("Draw!\n")
+    sys.stderr.flush()
 
 
 if __name__ == "__main__":
-    play_game(
+    ret = play_game(
         map_path="./generated.txt",
         turn_time=1.0,
         max_turns=200,
         p1_command="python ./level2.py",
         p2_command="python ./level3.py"
     )
+
+    print_finish(ret.winner, ret.reason)
+    sys.stdout.write(ret.output)
+    sys.stdout.flush()
