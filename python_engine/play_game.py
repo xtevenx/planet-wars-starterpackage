@@ -52,16 +52,14 @@ def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, 
         p1_moves = player_one.last_response
         p2_moves = player_two.last_response
 
-        illegal_move = False
         for move_string in p1_moves:
             try:
                 assert pw.add_fleet(1, *(int(x) for x in move_string.split()))
             except (ValueError, TypeError, AssertionError):
                 result.winner = 2
                 result.reason = f"Player 1 illegal move: \"{move_string}\""
-                illegal_move = True
                 break
-        if illegal_move:
+        if result.winner:
             break
 
         for move_string in p2_moves:
@@ -70,9 +68,8 @@ def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, 
             except (ValueError, TypeError, AssertionError):
                 result.winner = 1
                 result.reason = f"Player 2 illegal move: \"{move_string}\""
-                illegal_move = True
                 break
-        if illegal_move:
+        if result.winner:
             break
 
         pw.simulate_turn()
