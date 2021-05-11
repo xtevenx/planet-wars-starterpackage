@@ -29,6 +29,13 @@ class Player:
             self._process.kill()
 
     def get_response(self, input_string: str) -> list[str]:
+        try:
+            return self._get_response(input_string)
+        except OSError:
+            self.had_error = True
+            return []
+
+    def _get_response(self, input_string: str) -> list[str]:
         self._process.stdin.write(input_string)
         self._process.stdin.flush()
 
