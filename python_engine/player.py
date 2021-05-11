@@ -16,6 +16,7 @@ class Player:
         )
 
         self.last_response: list[str] = []
+        self.had_error: bool = False
 
     def __del__(self) -> None:
         self._process.terminate()
