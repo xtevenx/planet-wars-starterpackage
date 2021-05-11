@@ -35,16 +35,18 @@ def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, 
         end_time = time.perf_counter() + turn_time
         p1_thread.join(timeout=end_time - time.perf_counter())
         p2_thread.join(timeout=end_time - time.perf_counter())
+        p1_timeout = p1_thread.is_alive()
+        p2_timeout = p2_thread.is_alive()
 
-        if p1_thread.is_alive() or player_one.had_error:
-            if p2_thread.is_alive() or player_two.had_error:
+        if p1_timeout or player_one.had_error:
+            if p2_timeout or player_two.had_error:
                 result.winner = 0
                 result.reason = "Both players timed out."
             else:
                 result.winner = 2
                 result.reason = "Player 1 timed out."
             break
-        if p2_thread.is_alive() or player_two.had_error:
+        if p2_timeout or player_two.had_error:
             result.winner = 1
             result.reason = "Player 2 timed out."
             break
