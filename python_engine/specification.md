@@ -38,7 +38,7 @@ The output is split into two parts, separated by a pipe character:
     x,y,owner,numShips,growthRate
     ```
 
-  - The second part is the information for the turns. The fleets are
+  - The second part is the information for the turns. The turns are
     separated by colons and formatted as follows:
       - A turn has multiple values separated by commas:
           - The first `|P|` values are information for the planet states:
@@ -52,7 +52,7 @@ The output is split into two parts, separated by a pipe character:
             ```text
             owner.numShips.sourcePlanet.destinationPlanet.totalTripLength.turnsRemaining
             ```
-            
+
 Miscellaneous
 -------------
 
