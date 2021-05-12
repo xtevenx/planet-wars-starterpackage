@@ -26,8 +26,18 @@ def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, 
         result.error = "Map file not found."
         return result
 
-    player_one = player.Player(p1_command)
-    player_two = player.Player(p2_command)
+    try:
+        player_one = player.Player(p1_command)
+    except FileNotFoundError:
+        result.error = "Unable to start player 1."
+        return result
+
+    try:
+        player_two = player.Player(p2_command)
+    except FileNotFoundError:
+        result.error = "Unable to start player 2."
+        return result
+
     while pw.get_winner() == 0 and pw.num_turns() <= max_turns:
         p1_input = pw.get_state()
         p2_input = pw.get_state(invert=True)
