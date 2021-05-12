@@ -2,8 +2,8 @@ import sys
 import threading
 import time
 
-from planet_wars import PlanetWars
-from player import Player
+import planet_wars
+import player
 
 
 class GameResult:
@@ -16,12 +16,12 @@ class GameResult:
 def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, p2_command: str
               ) -> GameResult:
     with open(map_path, "r") as fp:
-        pw = PlanetWars(fp.read())
+        pw = planet_wars.PlanetWars(fp.read())
 
     result = GameResult()
 
-    player_one = Player(p1_command)
-    player_two = Player(p2_command)
+    player_one = player.Player(p1_command)
+    player_two = player.Player(p2_command)
     while pw.get_winner() == 0 and pw.num_turns() <= max_turns:
         p1_input = pw.get_state()
         p2_input = pw.get_state(invert=True)
