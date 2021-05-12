@@ -7,18 +7,24 @@ import player
 
 
 class GameResult:
-    def __init__(self, winner: int = None, reason: str = None, output: str = None) -> None:
+    def __init__(self, winner: int = None, reason: str = None, output: str = None,
+                 error: str = None) -> None:
         self.winner: int = winner
         self.reason: str = reason
         self.output: str = output
+        self.error: str = error
 
 
 def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, p2_command: str
               ) -> GameResult:
-    with open(map_path, "r") as fp:
-        pw = planet_wars.PlanetWars(fp.read())
-
     result = GameResult()
+
+    try:
+        with open(map_path, "r") as fp:
+            pw = planet_wars.PlanetWars(fp.read())
+    except FileNotFoundError:
+        result.error = "Map file not found."
+        return result
 
     player_one = player.Player(p1_command)
     player_two = player.Player(p2_command)
@@ -122,6 +128,10 @@ if __name__ == "__main__":
         p2_command=arguments.player_two,
     )
 
-    print_finish(ret.winner, ret.reason)
-    sys.stdout.write(ret.output)
-    sys.stdout.flush()
+    if ret.error:
+        sys.stderr.write(ret.error + "\n")
+        sys.stderr.flush()
+    else:
+        print_finish(ret.winner, ret.reason)
+        sys.stdout.write(ret.output)
+        sys.stdout.flush()
