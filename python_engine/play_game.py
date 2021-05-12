@@ -99,12 +99,27 @@ def print_finish(winner: int, reason: str = None) -> None:
 
 
 if __name__ == "__main__":
+    import argparse
+
+    parser = argparse.ArgumentParser("Play a Planet Wars game.")
+    parser.add_argument(
+        "map_path", action="store", type=str, help="path to the map file.")
+    parser.add_argument(
+        "turn_time", action="store", type=float, help="maximum seconds for each turn.")
+    parser.add_argument(
+        "max_turns", action="store", type=int, help="maximum number of turns.")
+    parser.add_argument(
+        "player_one", action="store", type=str, help="command to run the first bot.")
+    parser.add_argument(
+        "player_two", action="store", type=str, help="command to run the second bot.")
+    arguments = parser.parse_args()
+
     ret = play_game(
-        map_path="./generated.txt",
-        turn_time=1.0,
-        max_turns=200,
-        p1_command="python ./level2.py",
-        p2_command="python ./level3.py"
+        map_path=arguments.map_path,
+        turn_time=arguments.turn_time,
+        max_turns=arguments.max_turns,
+        p1_command=arguments.player_one,
+        p2_command=arguments.player_two,
     )
 
     print_finish(ret.winner, ret.reason)
