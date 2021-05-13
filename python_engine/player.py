@@ -5,6 +5,10 @@ import time
 KILL_TIMEOUT: float = 1.0
 
 
+def _retrieve_function(stream):
+    return lambda: str(stream.readline()).strip()
+
+
 class Player:
     def __init__(self, command: str) -> None:
         self._process = subprocess.Popen(
@@ -43,6 +47,6 @@ class Player:
         self._process.stdin.flush()
 
         self.last_response = []
-        while (line := str(self._process.stdout.readline()).strip()) and line != "go":
+        for line in iter(_retrieve_function(self._process.stdout), "go"):
             self.last_response.append(line)
         return self.last_response
