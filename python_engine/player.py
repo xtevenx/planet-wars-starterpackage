@@ -19,6 +19,9 @@ class Player:
         self.had_error: bool = False
 
     def __del__(self) -> None:
+        if not hasattr(self, "_process"):
+            return
+
         self._process.terminate()
 
         timeout_time = time.perf_counter() + KILL_TIMEOUT

@@ -28,13 +28,13 @@ def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, 
 
     try:
         player_one = player.Player(p1_command)
-    except FileNotFoundError:
+    except (FileNotFoundError, OSError):
         result.error = "Unable to start player 1."
         return result
 
     try:
         player_two = player.Player(p2_command)
-    except FileNotFoundError:
+    except (FileNotFoundError, OSError):
         result.error = "Unable to start player 2."
         return result
 
