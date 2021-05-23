@@ -7,12 +7,18 @@ import player
 
 
 class GameResult:
-    def __init__(self, winner: int = None, reason: str = None, output: str = None, error: str = None
-                 ) -> None:
+    def __init__(self, winner: int = None, reason: str = None, output: str = None) -> None:
+        # `.winner` can be one of four values: [0, 1, 2] if the game was played
+        # without hitches, or None if an error occurred.
         self.winner: int = winner
+
+        # `.reason` is the justification for a game's result (can be None if the
+        # game was played without anything extraordinary). If `.winner` is None,
+        # `.reason` is instead the error which occurred.
         self.reason: str = reason
+
+        # `.output` is the data which can be used as input for a visualizer.
         self.output: str = output
-        self.error: str = error
 
 
 def init_planet_wars(map_path: str) -> typing.Optional[planet_wars.PlanetWars]:
@@ -32,20 +38,16 @@ def init_player(command: str) -> typing.Optional[player.Player]:
 
 def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, p2_command: str
               ) -> GameResult:
-    pw = init_planet_wars(map_path)
-    if not pw:
-        return GameResult(error="Map file not found.")
+    if not (pw := init_planet_wars(map_path)):
+        return GameResult(reason="Map file not found.")
 
-    player_one = init_player(p1_command)
-    if not player_one:
-        return GameResult(error="Unable to start player one.")
+    if not (player_one := init_player(p1_command)):
+        return GameResult(reason="Unable to start player one.")
 
-    player_two = init_player(p2_command)
-    if not player_two:
-        return GameResult(error="Unable to start player_two")
+    if not (player_two := init_player(p2_command)):
+        return GameResult(reason="Unable to start player_two")
 
     result = GameResult()
-
     while pw.get_winner() == 0 and pw.num_turns() <= max_turns:
         p1_input = pw.get_state()
         p2_input = pw.get_state(invert=True)
@@ -109,10 +111,11 @@ def print_finish(winner: int, reason: str = None) -> None:
     if reason:
         sys.stderr.write(f"{reason}\n")
 
-    if winner:
-        sys.stderr.write(f"Player {winner} wins!\n")
-    else:
-        sys.stderr.write("Draw!\n")
+    if winner is not None:
+        if winner:
+            sys.stderr.write(f"Player {winner} wins!\n")
+        else:
+            sys.stderr.write("Draw!\n")
     sys.stderr.flush()
 
 
@@ -132,7 +135,7 @@ if __name__ == "__main__":
         "player_two", action="store", type=str, help="command to run the second bot.")
     arguments = parser.parse_args()
 
-    ret = play_game(
+    gr = play_game(
         map_path=arguments.map_path,
         turn_time=arguments.turn_time,
         max_turns=arguments.max_turns,
@@ -140,10 +143,7 @@ if __name__ == "__main__":
         p2_command=arguments.player_two,
     )
 
-    if ret.error:
-        sys.stderr.write(ret.error + "\n")
-        sys.stderr.flush()
-    else:
-        print_finish(ret.winner, ret.reason)
-        sys.stdout.write(ret.output)
+    print_finish(gr.winner, gr.reason)
+    if gr.winner is not None:
+        sys.stdout.write(gr.output)
         sys.stdout.flush()
