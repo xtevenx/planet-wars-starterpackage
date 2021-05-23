@@ -42,33 +42,30 @@ def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, 
         p1_input = pw.get_state()
         p2_input = pw.get_state(invert=True)
 
-        p1_thread = threading.Thread(target=player_one.get_response, args=(p1_input,))
-        p2_thread = threading.Thread(target=player_two.get_response, args=(p2_input,))
-
-        p1_thread.start()
-        p2_thread.start()
+        p1_turn = player.TurnThread(player_one, p1_input)
+        p2_turn = player.TurnThread(player_two, p2_input)
 
         end_time = time.perf_counter() + turn_time
-        p1_thread.join(timeout=end_time - time.perf_counter())
-        p2_thread.join(timeout=end_time - time.perf_counter())
-        p1_timeout = p1_thread.is_alive()
-        p2_timeout = p2_thread.is_alive()
+        p1_turn.join(timeout=end_time - time.perf_counter())
+        p2_turn.join(timeout=end_time - time.perf_counter())
+        p1_timeout = p1_turn.is_alive()
+        p2_timeout = p2_turn.is_alive()
 
-        if p1_timeout or player_one.had_error:
-            if p2_timeout or player_two.had_error:
+        if p1_timeout or p1_turn.had_error:
+            if p2_timeout or p2_turn.had_error:
                 result.winner = 0
                 result.reason = "Both players timed out."
             else:
                 result.winner = 2
                 result.reason = "Player 1 timed out."
             break
-        if p2_timeout or player_two.had_error:
+        if p2_timeout or p2_turn.had_error:
             result.winner = 1
             result.reason = "Player 2 timed out."
             break
 
-        p1_moves = player_one.last_response
-        p2_moves = player_two.last_response
+        p1_moves = p1_turn.output_list
+        p2_moves = p2_turn.output_list
 
         for move_string in p1_moves:
             try:
