@@ -79,15 +79,18 @@ def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, 
             break
 
         p1_bad_move = add_moves(pw, p1_turn.output_list, 1)
-        if p1_bad_move:
-            result.winner = 2
-            result.reason = f"Player 1 illegal move: \"{p1_bad_move}\""
-            break
-
         p2_bad_move = add_moves(pw, p2_turn.output_list, 2)
-        if p2_bad_move:
-            result.winner = 1
-            result.reason = f"Player 2 illegal move: \"{p2_bad_move}\""
+
+        if p1_bad_move or p2_bad_move:
+            if p1_bad_move and p2_bad_move:
+                result.winner = 0
+                result.reason = "Both players had illegal moves."
+            elif p1_bad_move:
+                result.winner = 2
+                result.reason = f"Player 1 illegal move: \"{p1_bad_move}\""
+            else:
+                result.winner = 1
+                result.reason = f"Player 2 illegal move: \"{p2_bad_move}\""
             break
 
         pw.simulate_turn()
