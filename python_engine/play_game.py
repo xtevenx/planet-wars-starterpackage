@@ -1,42 +1,50 @@
 import sys
-import threading
 import time
+import typing
 
 import planet_wars
 import player
 
 
 class GameResult:
-    def __init__(self, winner: int = None, reason: str = None, output: str = None,
-                 error: str = None) -> None:
+    def __init__(self, winner: int = None, reason: str = None, output: str = None, error: str = None
+                 ) -> None:
         self.winner: int = winner
         self.reason: str = reason
         self.output: str = output
         self.error: str = error
 
 
-def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, p2_command: str
-              ) -> GameResult:
-    result = GameResult()
-
+def init_planet_wars(map_path: str) -> typing.Optional[planet_wars.PlanetWars]:
     try:
         with open(map_path, "r") as fp:
-            pw = planet_wars.PlanetWars(fp.read())
+            return planet_wars.PlanetWars(fp.read())
     except FileNotFoundError:
-        result.error = "Map file not found."
-        return result
+        return None
 
-    try:
-        player_one = player.Player(p1_command)
-    except (FileNotFoundError, OSError):
-        result.error = "Unable to start player 1."
-        return result
 
+def init_player(command: str) -> typing.Optional[player.Player]:
     try:
-        player_two = player.Player(p2_command)
+        return player.Player(command)
     except (FileNotFoundError, OSError):
-        result.error = "Unable to start player 2."
-        return result
+        return None
+
+
+def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, p2_command: str
+              ) -> GameResult:
+    pw = init_planet_wars(map_path)
+    if not pw:
+        return GameResult(error="Map file not found.")
+
+    player_one = init_player(p1_command)
+    if not player_one:
+        return GameResult(error="Unable to start player one.")
+
+    player_two = init_player(p2_command)
+    if not player_two:
+        return GameResult(error="Unable to start player_two")
+
+    result = GameResult()
 
     while pw.get_winner() == 0 and pw.num_turns() <= max_turns:
         p1_input = pw.get_state()
@@ -64,10 +72,7 @@ def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, 
             result.reason = "Player 2 timed out."
             break
 
-        p1_moves = p1_turn.output_list
-        p2_moves = p2_turn.output_list
-
-        for move_string in p1_moves:
+        for move_string in p1_turn.output_list:
             try:
                 assert pw.add_fleet(1, *(int(x) for x in move_string.split()))
             except (ValueError, TypeError, AssertionError):
@@ -77,7 +82,7 @@ def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, 
         if result.winner:
             break
 
-        for move_string in p2_moves:
+        for move_string in p2_turn.output_list:
             try:
                 assert pw.add_fleet(2, *(int(x) for x in move_string.split()))
             except (ValueError, TypeError, AssertionError):
