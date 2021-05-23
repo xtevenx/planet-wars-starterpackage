@@ -55,7 +55,7 @@ class TurnThread(threading.Thread):
         self.output_list: list[str] = []
         self.had_error: bool = False
 
-        super().__init__(target=self._do_turn, args=(player, input_string))
+        super().__init__(target=self._do_turn, args=(player, input_string), daemon=True)
         self.start()
 
     def _do_turn(self, player: Player, input_string: str) -> None:
