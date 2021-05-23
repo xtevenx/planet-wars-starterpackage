@@ -36,6 +36,14 @@ def init_player(command: str) -> typing.Optional[player.Player]:
         return None
 
 
+def add_moves(pw: planet_wars.PlanetWars, move_list: list[str], owner: int) -> typing.Optional[str]:
+    for move_string in move_list:
+        try:
+            assert pw.add_fleet(owner, *(int(x) for x in move_string.split()))
+        except (ValueError, TypeError, AssertionError):
+            return move_string
+
+
 def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, p2_command: str
               ) -> GameResult:
     if not (pw := init_planet_wars(map_path)):
@@ -49,49 +57,37 @@ def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, 
 
     result = GameResult()
     while pw.get_winner() == 0 and pw.num_turns() <= max_turns:
-        p1_input = pw.get_state()
-        p2_input = pw.get_state(invert=True)
-
-        p1_turn = player.TurnThread(player_one, p1_input)
-        p2_turn = player.TurnThread(player_two, p2_input)
+        p1_turn = player.TurnThread(player_one, pw.get_state())
+        p2_turn = player.TurnThread(player_two, pw.get_state(invert=True))
 
         end_time = time.perf_counter() + turn_time
         p1_turn.join(timeout=end_time - time.perf_counter())
         p2_turn.join(timeout=end_time - time.perf_counter())
-        p1_timeout = p1_turn.is_alive()
-        p2_timeout = p2_turn.is_alive()
+        p1_timeout = p1_turn.is_alive() or p1_turn.had_error
+        p2_timeout = p2_turn.is_alive() or p2_turn.had_error
 
-        if p1_timeout or p1_turn.had_error:
-            if p2_timeout or p2_turn.had_error:
+        if p1_timeout or p2_timeout:
+            if p1_timeout and p2_timeout:
                 result.winner = 0
                 result.reason = "Both players timed out."
-            else:
+            elif p1_timeout:
                 result.winner = 2
                 result.reason = "Player 1 timed out."
-            break
-        if p2_timeout or p2_turn.had_error:
-            result.winner = 1
-            result.reason = "Player 2 timed out."
-            break
-
-        for move_string in p1_turn.output_list:
-            try:
-                assert pw.add_fleet(1, *(int(x) for x in move_string.split()))
-            except (ValueError, TypeError, AssertionError):
-                result.winner = 2
-                result.reason = f"Player 1 illegal move: \"{move_string}\""
-                break
-        if result.winner:
-            break
-
-        for move_string in p2_turn.output_list:
-            try:
-                assert pw.add_fleet(2, *(int(x) for x in move_string.split()))
-            except (ValueError, TypeError, AssertionError):
+            else:
                 result.winner = 1
-                result.reason = f"Player 2 illegal move: \"{move_string}\""
-                break
-        if result.winner:
+                result.reason = "Player 2 timed out."
+            break
+
+        p1_bad_move = add_moves(pw, p1_turn.output_list, 1)
+        if p1_bad_move:
+            result.winner = 2
+            result.reason = f"Player 1 illegal move: \"{p1_bad_move}\""
+            break
+
+        p2_bad_move = add_moves(pw, p2_turn.output_list, 2)
+        if p2_bad_move:
+            result.winner = 1
+            result.reason = f"Player 2 illegal move: \"{p2_bad_move}\""
             break
 
         pw.simulate_turn()
