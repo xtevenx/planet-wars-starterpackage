@@ -50,19 +50,28 @@ class Player:
         self._process.stdin.write(input_string)
         self._process.stdin.flush()
 
+    def is_alive(self) -> bool:
+        return self._process.poll() is None
+
 
 class TurnThread(threading.Thread):
     def __init__(self, player: Player, input_string: str) -> None:
         self.output_list: list[str] = []
         self.had_error: bool = False
 
-        super().__init__(target=self._do_turn, args=(player, input_string), daemon=True)
+        super().__init__(target=self._do_turn, args=(player, input_string))
         self.start()
 
     def _do_turn(self, player: Player, input_string: str) -> None:
         try:
             player.send_stdin(input_string)
-            while (line := str(player.stdout_queue.get(block=True, timeout=None)).strip()) != "go":
-                self.output_list.append(line)
+            while player.is_alive():
+                try:
+                    line = str(player.stdout_queue.get_nowait()).strip()
+                    if line == "go":
+                        break
+                    self.output_list.append(line)
+                except queue.Empty:
+                    ...
         except OSError:
             self.had_error = True
