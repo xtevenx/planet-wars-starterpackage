@@ -102,6 +102,9 @@ def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, 
 
         result.winner = pw.get_winner(force=True)
 
+    player_one.stop()
+    player_two.stop()
+
     result.output = pw.get_output()
     return result
 

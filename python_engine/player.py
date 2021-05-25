@@ -19,12 +19,12 @@ class Player:
 
         self.stdout_queue = queue.Queue()
         self.stderr_queue = queue.Queue()
-        self._stdout_thread = threading.Thread(target=self._monitor_stdout, daemon=True)
-        self._stderr_thread = threading.Thread(target=self._monitor_stderr, daemon=True)
+        self._stdout_thread = threading.Thread(target=self._monitor_stdout)
+        self._stderr_thread = threading.Thread(target=self._monitor_stderr)
         self._stdout_thread.start()
         self._stderr_thread.start()
 
-    def __del__(self) -> None:
+    def stop(self) -> None:
         if not hasattr(self, "_process"):
             return
 
@@ -36,6 +36,7 @@ class Player:
                 break
         else:
             self._process.kill()
+            self._process.wait()
 
     def _monitor_stdout(self) -> None:
         for line in self._process.stdout:
