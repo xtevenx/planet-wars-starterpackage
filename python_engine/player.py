@@ -3,12 +3,18 @@ import shlex
 import subprocess
 import threading
 import time
+import typing
+
+HANDLER_TYPE = typing.Callable[[str], typing.Any]
+NO_HANDLER: HANDLER_TYPE = lambda _: None
 
 KILL_TIMEOUT: float = 1.0
 
 
 class Player:
-    def __init__(self, command: str) -> None:
+    def __init__(self, command: str, stdin_handler: HANDLER_TYPE = NO_HANDLER,
+                 stdout_handler: HANDLER_TYPE = NO_HANDLER,
+                 stderr_handler: HANDLER_TYPE = NO_HANDLER) -> None:
         self._process = subprocess.Popen(
             args=shlex.split(command),
             stdin=subprocess.PIPE,
@@ -16,6 +22,10 @@ class Player:
             stderr=subprocess.PIPE,
             universal_newlines=True
         )
+
+        self._stdin_handler: HANDLER_TYPE = stdin_handler
+        self._stdout_handler: HANDLER_TYPE = stdout_handler
+        self._stderr_handler: HANDLER_TYPE = stderr_handler
 
         self.stdout_queue = queue.Queue()
         self.stderr_queue = queue.Queue()
@@ -41,14 +51,18 @@ class Player:
     def _monitor_stdout(self) -> None:
         for line in self._process.stdout:
             self.stdout_queue.put(line)
+            self._stdout_handler(line)
 
     def _monitor_stderr(self) -> None:
         for line in self._process.stderr:
             self.stderr_queue.put(line)
+            self._stderr_handler(line)
 
     def send_stdin(self, input_string: str) -> None:
         self._process.stdin.write(input_string)
         self._process.stdin.flush()
+
+        self._stdin_handler(input_string)
 
     def is_alive(self) -> bool:
         return self._process.poll() is None
