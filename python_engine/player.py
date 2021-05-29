@@ -65,7 +65,7 @@ class TurnThread(threading.Thread):
     def _do_turn(self, player: Player, input_string: str) -> None:
         try:
             player.send_stdin(input_string)
-            while player.is_alive():
+            while player.is_alive() or not player.stdout_queue.empty():
                 try:
                     line = str(player.stdout_queue.get_nowait()).strip()
                     if line == "go":
