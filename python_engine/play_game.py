@@ -29,9 +29,9 @@ def init_planet_wars(map_path: str) -> typing.Optional[planet_wars.PlanetWars]:
         return None
 
 
-def init_player(command: str) -> typing.Optional[player.Player]:
+def init_player(*args, **kwargs) -> typing.Optional[player.Player]:
     try:
-        return player.Player(command)
+        return player.Player(*args, **kwargs)
     except (FileNotFoundError, OSError):
         return None
 
@@ -44,15 +44,16 @@ def add_moves(pw: planet_wars.PlanetWars, move_list: list[str], owner: int) -> t
             return move_string
 
 
-def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, p2_command: str
-              ) -> GameResult:
+def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, p2_command: str,
+              p1_handler: player.HANDLER_TYPE = player.NO_HANDLER,
+              p2_handler: player.HANDLER_TYPE = player.NO_HANDLER) -> GameResult:
     if not (pw := init_planet_wars(map_path)):
         return GameResult(reason="Map file not found.")
 
-    if not (player_one := init_player(p1_command)):
+    if not (player_one := init_player(p1_command, stderr_handler=p1_handler)):
         return GameResult(reason="Unable to start player one.")
 
-    if not (player_two := init_player(p2_command)):
+    if not (player_two := init_player(p2_command, stderr_handler=p2_handler)):
         return GameResult(reason="Unable to start player_two")
 
     result = GameResult()
