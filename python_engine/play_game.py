@@ -5,6 +5,13 @@ import time
 import planet_wars
 import player
 
+# Amount of seconds to wait extra to prevent illegitimate timeouts.
+TIMEOUT_LEEWAY: float = 0.1
+
+# At the time of writing, this is the same thing as _INVERT in planet_wars.py,
+# but it feels improper to use the same item for different purposes. :)
+OTHER_PLAYER: dict[int, int] = {1: 2, 2: 1}
+
 
 class GameResult:
 
@@ -103,19 +110,26 @@ def play_game(
         p1_thread.input_queue.put(pw.get_state())
         p2_thread.input_queue.put(pw.get_state(invert=True))
 
+        turn_end = time.perf_counter() + TIMEOUT_LEEWAY
+
         try:
-            p1_output = p1_thread.output_queue.get(timeout=turn_time)
-            p1_timeout = p1_thread.output_time - p1_thread.input_time > turn_time \
-                    or p1_thread.had_error
+            block_duration = max(TIMEOUT_LEEWAY,
+                                 turn_end - time.perf_counter())
+            p1_output = p1_thread.output_queue.get(timeout=block_duration)
+            p1_timeout = p1_thread.output_time - p1_thread.input_time > turn_time
         except queue.Empty:
             p1_timeout = True
 
         try:
-            p2_output = p2_thread.output_queue.get(timeout=turn_time)
-            p2_timeout = p2_thread.output_time - p2_thread.input_time > turn_time \
-                    or p2_thread.had_error
+            block_duration = max(TIMEOUT_LEEWAY,
+                                 turn_end - time.perf_counter())
+            p2_output = p2_thread.output_queue.get(timeout=block_duration)
+            p2_timeout = p2_thread.output_time - p2_thread.input_time > turn_time
         except queue.Empty:
             p2_timeout = True
+
+        p1_timeout = p1_timeout or p1_thread.had_error
+        p2_timeout = p2_timeout or p2_thread.had_error
 
         if p1_timeout or p2_timeout:
             if p1_timeout and p2_timeout:
@@ -129,19 +143,19 @@ def play_game(
                 result.reason = "Player 2 timed out."
             break
 
-        p1_bad_move = add_moves(pw, p1_output, 1)
-        p2_bad_move = add_moves(pw, p2_output, 2)
+        p1_illegal_move = add_moves(pw, p1_output, 1)
+        p2_illegal_move = add_moves(pw, p2_output, 2)
 
-        if p1_bad_move or p2_bad_move:
-            if p1_bad_move and p2_bad_move:
+        if p1_illegal_move or p2_illegal_move:
+            if p1_illegal_move and p2_illegal_move:
                 result.winner = 0
                 result.reason = "Both players had illegal moves."
-            elif p1_bad_move:
+            elif p1_illegal_move:
                 result.winner = 2
-                result.reason = f'Player 1 illegal move: \"{p1_bad_move}\"'
+                result.reason = f'Player 1 illegal move: \"{p1_illegal_move}\"'
             else:
                 result.winner = 1
-                result.reason = f'Player 2 illegal move: \"{p2_bad_move}\"'
+                result.reason = f'Player 2 illegal move: \"{p2_illegal_move}\"'
             break
 
         pw.simulate_turn()
