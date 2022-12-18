@@ -8,10 +8,6 @@ import player
 # Amount of seconds to wait extra to prevent illegitimate timeouts.
 TIMEOUT_LEEWAY: float = 0.1
 
-# At the time of writing, this is the same thing as _INVERT in planet_wars.py,
-# but it feels improper to use the same item for different purposes. :)
-OTHER_PLAYER: dict[int, int] = {1: 2, 2: 1}
-
 
 class GameResult:
 
