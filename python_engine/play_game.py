@@ -69,16 +69,17 @@ def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, 
 
         try:
             p1_output = p1_thread.output_queue.get(timeout=end_time - time.perf_counter())
+            p1_timeout = p1_thread.output_time > end_time or p1_thread.had_error
         except queue.Empty:
             p1_output = []
+            p1_timeout = True
 
         try:
             p2_output = p2_thread.output_queue.get(timeout=end_time - time.perf_counter())
+            p2_timeout = p2_thread.output_time > end_time or p2_thread.had_error
         except queue.Empty:
             p2_output = []
-
-        p1_timeout = p1_thread.output_time > end_time or p1_thread.had_error
-        p2_timeout = p2_thread.output_time > end_time or p2_thread.had_error
+            p2_timeout = True
 
         if p1_timeout or p2_timeout:
             if p1_timeout and p2_timeout:
@@ -116,13 +117,13 @@ def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, 
 
         result.winner = pw.get_winner(force=True)
 
+    player_one.stop()
+    player_two.stop()
+
     p1_thread.input_queue.put(None)
     p2_thread.input_queue.put(None)
     p1_thread.join()
     p2_thread.join()
-
-    player_one.stop()
-    player_two.stop()
 
     result.output = pw.get_output()
     return result

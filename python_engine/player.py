@@ -86,8 +86,8 @@ class PlayerThread(threading.Thread):
             if input_string is None:
                 break
 
-            self.output_queue.put(self._do_turn(input_string))
             self.output_time = time.perf_counter()
+            self.output_queue.put(self._do_turn(input_string))
 
     def _do_turn(self, input_string: str) -> list[str]:
         output_list: list[str] = []
