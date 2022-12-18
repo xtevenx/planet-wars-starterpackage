@@ -42,8 +42,8 @@ class Player:
         self._stderr_thread.start()
 
     def stop(self) -> None:
-        # I forget why this is neceessary. It's probably something to
-        # do with subprocess.Popen running into an error or some sort.
+        # I forget why this is neceessary. It's probably something to do with
+        # subprocess.Popen running into an error or some sort.
         if not hasattr(self, "_process"):
             return
 
@@ -92,6 +92,9 @@ class PlayerThread(threading.Thread):
         # We receive items from this queue representing the game engine's inputs.
         self.input_queue = queue.Queue()
 
+        # Float representing the time of the last input.
+        self.input_time: float = 0
+
         # We put items into this queue representing the Player's outputs.
         self.output_queue = queue.Queue()
 
@@ -106,10 +109,13 @@ class PlayerThread(threading.Thread):
 
     def _main_loop(self) -> None:
         while (input_string := self.input_queue.get()) != THREAD_EXIT:
-            # Update output_time before pushing the queue to ensure the
-            # new time is used in the main thread.
+            self.input_time = time.perf_counter()
+            output_list = self._do_turn(input_string)
+
+            # Update output_time before pushing the queue to ensure the new
+            # time is used in the main thread.
             self.output_time = time.perf_counter()
-            self.output_queue.put(self._do_turn(input_string))
+            self.output_queue.put(output_list)
 
     def _do_turn(self, input_string: str) -> list[str]:
         output_list: list[str] = []
