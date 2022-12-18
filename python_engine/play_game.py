@@ -46,8 +46,8 @@ def add_moves(pw: planet_wars.PlanetWars, move_list: list[str], owner: int) -> t
 
 
 def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, p2_command: str,
-              p1_handler: player.HANDLER_TYPE = player.NO_HANDLER,
-              p2_handler: player.HANDLER_TYPE = player.NO_HANDLER) -> GameResult:
+              p1_handler: player.HANDLER_TYPE = player.nothing_handler,
+              p2_handler: player.HANDLER_TYPE = player.nothing_handler) -> GameResult:
     if not (pw := init_planet_wars(map_path)):
         return GameResult(reason="Map file not found.")
 
@@ -117,11 +117,17 @@ def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, 
 
         result.winner = pw.get_winner(force=True)
 
+    # Send the exit signal to the PlayerThread._main_loop().
+    p1_thread.input_queue.put(player.THREAD_EXIT)
+    p2_thread.input_queue.put(player.THREAD_EXIT)
+
+    # This sends the exit signal to the PlayerThread._do_turn().
     player_one.stop()
     player_two.stop()
 
-    p1_thread.input_queue.put(None)
-    p2_thread.input_queue.put(None)
+    # Join the PlayerThread objects. This, along with the two blocks of code above,
+    # should be done in the order given here. See PlayerThread documentation for more
+    # information.
     p1_thread.join()
     p2_thread.join()
 
