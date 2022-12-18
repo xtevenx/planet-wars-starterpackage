@@ -1,3 +1,4 @@
+import queue
 import sys
 import time
 import typing
@@ -56,16 +57,28 @@ def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, 
     if not (player_two := init_player(p2_command, stderr_handler=p2_handler)):
         return GameResult(reason="Unable to start player_two")
 
+    p1_thread = player.PlayerThread(player_one)
+    p2_thread = player.PlayerThread(player_two)
+
     result = GameResult()
     while pw.get_winner() == 0 and pw.num_turns() <= max_turns:
-        p1_turn = player.TurnThread(player_one, pw.get_state())
-        p2_turn = player.TurnThread(player_two, pw.get_state(invert=True))
+        p1_thread.input_queue.put(pw.get_state())
+        p2_thread.input_queue.put(pw.get_state(invert=True))
 
         end_time = time.perf_counter() + turn_time
-        p1_turn.join(timeout=end_time - time.perf_counter())
-        p2_turn.join(timeout=end_time - time.perf_counter())
-        p1_timeout = p1_turn.is_alive() or p1_turn.had_error
-        p2_timeout = p2_turn.is_alive() or p2_turn.had_error
+
+        try:
+            p1_output = p1_thread.output_queue.get(timeout=end_time - time.perf_counter())
+        except queue.Empty:
+            p1_output = []
+
+        try:
+            p2_output = p2_thread.output_queue.get(timeout=end_time - time.perf_counter())
+        except queue.Empty:
+            p2_output = []
+
+        p1_timeout = p1_thread.output_time > end_time or p1_thread.had_error
+        p2_timeout = p2_thread.output_time > end_time or p2_thread.had_error
 
         if p1_timeout or p2_timeout:
             if p1_timeout and p2_timeout:
@@ -79,8 +92,8 @@ def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, 
                 result.reason = "Player 2 timed out."
             break
 
-        p1_bad_move = add_moves(pw, p1_turn.output_list, 1)
-        p2_bad_move = add_moves(pw, p2_turn.output_list, 2)
+        p1_bad_move = add_moves(pw, p1_output, 1)
+        p2_bad_move = add_moves(pw, p2_output, 2)
 
         if p1_bad_move or p2_bad_move:
             if p1_bad_move and p2_bad_move:
@@ -102,6 +115,11 @@ def play_game(map_path: str, turn_time: float, max_turns: int, p1_command: str, 
         pw.simulate_turn()
 
         result.winner = pw.get_winner(force=True)
+
+    p1_thread.input_queue.put(None)
+    p2_thread.input_queue.put(None)
+    p1_thread.join()
+    p2_thread.join()
 
     player_one.stop()
     player_two.stop()

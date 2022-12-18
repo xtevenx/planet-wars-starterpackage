@@ -68,24 +68,41 @@ class Player:
         return self._process.poll() is None
 
 
-class TurnThread(threading.Thread):
-    def __init__(self, player: Player, input_string: str) -> None:
-        self.output_list: list[str] = []
+class PlayerThread(threading.Thread):
+    def __init__(self, player: Player) -> None:
+        self.player: Player = player
+
+        self.input_queue = queue.Queue()
+        self.output_queue = queue.Queue()
+        self.output_time: float = 0
         self.had_error: bool = False
 
-        super().__init__(target=self._do_turn, args=(player, input_string))
+        super().__init__(target=self._main_loop)
         self.start()
 
-    def _do_turn(self, player: Player, input_string: str) -> None:
+    def _main_loop(self) -> None:
+        while True:
+            input_string = self.input_queue.get()
+            if input_string is None:
+                break
+
+            self.output_queue.put(self._do_turn(input_string))
+            self.output_time = time.perf_counter()
+
+    def _do_turn(self, input_string: str) -> list[str]:
+        output_list: list[str] = []
+
         try:
-            player.send_stdin(input_string)
-            while player.is_alive() or not player.stdout_queue.empty():
+            self.player.send_stdin(input_string)
+            while self.player.is_alive() or not self.player.stdout_queue.empty():
                 try:
-                    line = str(player.stdout_queue.get_nowait()).strip()
+                    line = str(self.player.stdout_queue.get_nowait()).strip()
                     if line == "go":
                         break
-                    self.output_list.append(line)
+                    output_list.append(line)
                 except queue.Empty:
                     ...
         except OSError:
             self.had_error = True
+
+        return output_list
