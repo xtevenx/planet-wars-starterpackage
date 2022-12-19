@@ -102,6 +102,9 @@ static PyTypeObject PlanetType = {
 
 // Define the Fleet class =====================================================
 
+#define FLEET_OUTPUT_STATE_LENGTH 32
+#define FLEET_GAME_STATE_LENGTH 32
+
 typedef struct {
     PyObject_HEAD int owner;
     int num_ships;
@@ -109,6 +112,10 @@ typedef struct {
     int destination_planet;
     int total_trip_length;
     int turns_remaining;
+    char output_state_string[FLEET_OUTPUT_STATE_LENGTH];
+    size_t output_state_length;
+    char game_state_string[FLEET_GAME_STATE_LENGTH];
+    size_t game_state_length;
 } Fleet;
 
 static void Fleet_dealloc(Fleet *self) {
@@ -135,6 +142,16 @@ static int Fleet_init(Fleet *self, PyObject *args, PyObject *kwds) {
             &self->total_trip_length, &self->turns_remaining))
         return -1;
 
+    self->output_state_length = snprintf(
+        self->output_state_string, FLEET_OUTPUT_STATE_LENGTH, "%d.%d.%d.%d.%d.",
+        self->owner, self->num_ships, self->source_planet,
+        self->destination_planet, self->total_trip_length);
+
+    self->game_state_length =
+        snprintf(self->game_state_string, FLEET_GAME_STATE_LENGTH,
+                 "F ? %d %d %d %d ", self->num_ships, self->source_planet,
+                 self->destination_planet, self->total_trip_length);
+
     return 0;
 }
 
@@ -153,11 +170,10 @@ static PyMemberDef Fleet_members[] = {
 };
 
 static PyObject *Fleet_output_state(Fleet *self, PyObject *Py_UNUSED(ignored)) {
-    static char s[32];
-    snprintf(s, 32, "%d.%d.%d.%d.%d.%d", self->owner, self->num_ships,
-             self->source_planet, self->destination_planet,
-             self->total_trip_length, self->turns_remaining);
-    return PyUnicode_FromString(s);
+    snprintf(self->output_state_string + self->output_state_length,
+             FLEET_OUTPUT_STATE_LENGTH - self->output_state_length, "%d",
+             self->turns_remaining);
+    return PyUnicode_FromString(self->output_state_string);
 }
 
 static PyObject *Fleet_game_state(Fleet *self, PyObject *args, PyObject *kwds) {
@@ -166,14 +182,11 @@ static PyObject *Fleet_game_state(Fleet *self, PyObject *args, PyObject *kwds) {
     int invert = 0;
     PyArg_ParseTupleAndKeywords(args, kwds, "|p", kwlist, &invert);
 
-    int owner =
-        self->owner == 0 ? 0 : (invert ? -self->owner + 3 : self->owner);
-
-    static char s[32];
-    snprintf(s, 32, "F %d %d %d %d %d %d", owner, self->num_ships,
-             self->source_planet, self->destination_planet,
-             self->total_trip_length, self->turns_remaining);
-    return PyUnicode_FromString(s);
+    self->game_state_string[2] = self->owner * (1 + invert) % 3 + '0';
+    snprintf(self->game_state_string + self->game_state_length,
+             FLEET_GAME_STATE_LENGTH - self->game_state_length, "%d",
+             self->turns_remaining);
+    return PyUnicode_FromString(self->game_state_string);
 }
 
 static PyMethodDef Fleet_methods[] = {
