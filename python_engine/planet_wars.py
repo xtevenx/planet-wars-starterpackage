@@ -11,8 +11,8 @@ class PlanetWars:
 
         self._parse_state(state_string.strip())
 
-        self._initial_output: str = ":".join(p.output_info()
-                                             for p in self._planet_list)
+        self._initial_output: str = ":".join(
+            [p.output_info() for p in self._planet_list])
         self._turns_output: list[str] = []
 
         # adjacency list style table for bot moves
@@ -108,10 +108,10 @@ class PlanetWars:
                               turns_remaining=distance))
 
     def _update_output(self) -> None:
-        planet_string: str = ",".join(p.output_state()
-                                      for p in self._planet_list)
-        fleet_string: str = ",".join(f.output_state()
-                                     for f in self._fleet_list)
+        planet_string: str = ",".join(
+            [p.output_state() for p in self._planet_list])
+        fleet_string: str = ",".join(
+            [f.output_state() for f in self._fleet_list])
         self._turns_output.append(",".join((planet_string, fleet_string)))
 
     def get_output(self) -> str:
@@ -151,9 +151,9 @@ class PlanetWars:
     def get_state(self, invert: bool = False) -> str:
         """Format game state information for game agents."""
         planet_string: str = "\n".join(
-            p.game_state(invert) for p in self._planet_list)
+            [p.game_state(invert) for p in self._planet_list])
         fleet_string: str = "\n".join(
-            f.game_state(invert) for f in self._fleet_list)
+            [f.game_state(invert) for f in self._fleet_list])
         return "\n".join((planet_string, fleet_string, "go\n"))
 
     def get_winner(self, force: bool = False) -> int:
