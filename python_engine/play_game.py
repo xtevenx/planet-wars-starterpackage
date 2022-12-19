@@ -148,10 +148,10 @@ def play_game(
                 result.reason = "Both players had illegal moves."
             elif p1_illegal_move:
                 result.winner = 2
-                result.reason = f'Player 1 illegal move: \"{p1_illegal_move}\"'
+                result.reason = f'Player 1 illegal move: "{p1_illegal_move}"'
             else:
                 result.winner = 1
-                result.reason = f'Player 2 illegal move: \"{p2_illegal_move}\"'
+                result.reason = f'Player 2 illegal move: "{p2_illegal_move}"'
             break
 
         pw.simulate_turn()
