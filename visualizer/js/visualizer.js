@@ -43,7 +43,8 @@ const Visualizer = {
     canvas: null, // defined in setup()
     ctx: null, // defined in setup()
     frame: 0,
-    frameSpeed: 0.07,
+    turnSpeed: 4, // Integer version of turn speed for easier management
+    turnsPerSecond: ((1 + Math.sqrt(5)) / 2) ** 4, // TurnsPerSecond = Phi ** turnSpeed
     playing: false,
     haveDrawnBackground: false,
     frameDrawStarted: null,
@@ -65,7 +66,6 @@ const Visualizer = {
         planet_pixels: [7, 10, 13, 17, 23, 29],
         showFleetText: true,
         display_margin: 35,
-        turnsPerSecond: 8,
         teamColor: ['#334444', '#aa0000', '#5588aa'],
         teamColor_highlight: ['#445555', '#ff0000', '#88bbdd'],
         fleetColor: ['rgba(64,080,080,1.00)', 'rgba(192,000,000,1.00)', 'rgba(112,160,240,1.00)'],
@@ -110,10 +110,11 @@ const Visualizer = {
     },
 
     changeSpeed: function (difference) {
-        // TODO: this.
-        this.frameSpeed *= difference;
-        this.frameSpeed = Math.min(0.29, this.frameSpeed);
-        this.frameSpeed = Math.max(0.01, this.frameSpeed);
+        const newSpeed = this.turnSpeed + difference
+        if (0 <= newSpeed && newSpeed <= 8) {
+            this.turnSpeed = newSpeed;
+            this.turnsPerSecond = ((1 + Math.sqrt(5)) / 2) ** this.turnSpeed;
+        }
     },
 
     unitToPixel: function (unit) {
@@ -390,6 +391,7 @@ const Visualizer = {
 
     stop: function () {
         this.playing = false;
+        this.frameDrawEnded = null;
         $('#play-button').html("&#9654;");
     },
 
@@ -398,22 +400,14 @@ const Visualizer = {
         if (!this.playing) return;
 
         this.frameDrawStarted = new Date().getTime();
-        this.drawFrame(this.frame);
-
-        let frameAdvance = (this.frameDrawStarted - this.frameDrawEnded) / (1000 / this.config.turnsPerSecond);
-        if (isNaN(frameAdvance)) {
-            frameAdvance = 1;
+        if (this.frameDrawEnded != null) {
+            this.frame += (this.frameDrawStarted - this.frameDrawEnded) / 1000 * this.turnsPerSecond;
         }
-
-        this.frame += Math.min(1, Math.max(this.frameSpeed, frameAdvance));
+        this.drawFrame(this.frame);
         this.frameDrawEnded = new Date().getTime();
+        this.frame += (this.frameDrawEnded - this.frameDrawStarted) / 1000 * this.turnsPerSecond;
 
-        // TODO: If frameAdvance is the minimum size (on a super fast system), then
-        // we need to delay drawing the next frame.
-        const timeToNextDraw = 1;
-        setTimeout(function () {
-            Visualizer.run.apply(Visualizer);
-        }, timeToNextDraw);
+        setTimeout(function () { Visualizer.run.apply(Visualizer); }, 0);
     },
 
     setFrame: function (targetFrame, wholeNumber) {
@@ -581,11 +575,11 @@ const Visualizer = {
 
 
     const speeddownAction = function () {
-        Visualizer.changeSpeed(0.618);
+        Visualizer.changeSpeed(-1);
         return false;
     };
     const speedupAction = function () {
-        Visualizer.changeSpeed(1.618);
+        Visualizer.changeSpeed(+1);
         return false;
     };
 
