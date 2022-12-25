@@ -40,10 +40,10 @@ const ParserUtils = {
 
 
 const Visualizer = {
-    canvas: null,
-    ctx: null,
+    canvas: null, // defined in setup()
+    ctx: null, // defined in setup()
     frame: 0,
-    frameSpeed: 0.1,
+    frameSpeed: 0.07,
     playing: false,
     haveDrawnBackground: false,
     frameDrawStarted: null,
@@ -58,7 +58,7 @@ const Visualizer = {
     active_planet: -1,
     shipCount: [0, 0, 0],
     growthRate: [0, 0, 0],
-    planetZOrder: [],
+    planetZOrder: [], // defined in setup()
     config: {
         planet_font: 'bold 14px Arial,Helvetica',
         fleet_font: 'normal 12px Arial,Helvetica',
@@ -81,30 +81,27 @@ const Visualizer = {
         // Parse data
         this.parseData(data);
 
-        // calculate offset and range so the map is centered and fills the area
+        // Calculate offset and range so the map is centered and fills the area
         let max_coords = {x: -999, y: -999};
-        let min_coords = {x: 999, y: 999};
-        let p;
+        let min_coords = {x:  999, y:  999};
         for (let i = 0; i < this.planets.length; i++) {
             this.planetZOrder.push(i);
-            p = this.planets[i];
+            let p = this.planets[i];
             if (p.x > max_coords.x) max_coords.x = p.x;
             if (p.x < min_coords.x) min_coords.x = p.x;
             if (p.y > max_coords.y) max_coords.y = p.y;
             if (p.y < min_coords.y) min_coords.y = p.y;
         }
-        let ranges = [max_coords.x - min_coords.x,
-            max_coords.y - min_coords.y];
-        let range = Math.max(ranges[0], ranges[1]);
-        // this.max_coords = max_coords;
-        // this.min_coords = min_coords;
+
+        let ranges = [max_coords.x - min_coords.x, max_coords.y - min_coords.y];
+        let range = Math.max(...ranges);
 
         let display_margin = this.config.display_margin;
         let unit_to_pixel = (this.canvas.height - display_margin * 2) / range;
+
         this.config.unit_to_pixel = unit_to_pixel;
-        this.config.offset = [
-            (-min_coords.x * unit_to_pixel) + display_margin,
-            (-min_coords.y * unit_to_pixel) + display_margin];
+        this.config.offset = [(-min_coords.x * unit_to_pixel) + display_margin,
+                              (-min_coords.y * unit_to_pixel) + display_margin];
         this.config.offset[0] += ((range - ranges[0]) / 2) * unit_to_pixel;
         this.config.offset[1] += ((range - ranges[1]) / 2) * unit_to_pixel;
 
@@ -113,14 +110,16 @@ const Visualizer = {
     },
 
     changeSpeed: function (difference) {
-        if ((this.frameSpeed > 0.01 + -difference) || (difference > 0)) {
-            this.frameSpeed = this.frameSpeed + difference;
-        }
+        // TODO: this.
+        this.frameSpeed *= difference;
+        this.frameSpeed = Math.min(0.29, this.frameSpeed);
+        this.frameSpeed = Math.max(0.01, this.frameSpeed);
     },
 
     unitToPixel: function (unit) {
         return this.config.unit_to_pixel * unit;
     },
+
     pixelToUnit: function (pixel) {
         return pixel / this.config.unit_to_pixel;
     },
@@ -134,6 +133,7 @@ const Visualizer = {
             ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
             this.haveDrawnBackground = true;
         }
+
         for (let i = 0; i < this.dirtyRegions.length; i++) {
             const region = this.dirtyRegions[i];
             ctx.fillRect(
@@ -143,14 +143,16 @@ const Visualizer = {
                 parseInt(region[3])
             );
         }
+
         this.dirtyRegions = [];
     },
 
     drawFrame: function (frame) {
-        let color;
-        let i;
-        let display_x = 0, display_y = 0;
         const ctx = this.ctx;
+
+        let display_x = 0;
+        let display_y = 0;
+
         let frameNumber = Math.floor(frame);
         if (frameNumber >= this.moves.length)
             frameNumber = this.moves.length - 1;
@@ -166,7 +168,7 @@ const Visualizer = {
         // Draw Planets
         ctx.font = this.config.planet_font;
         ctx.textAlign = 'center';
-        for (i = 0; i < this.planets.length; i++) {
+        for (let i = 0; i < this.planets.length; i++) {
             const z = this.planetZOrder[i];
             const planet = this.planets[z];
             planet.owner = planetStats[z].owner;
@@ -191,7 +193,7 @@ const Visualizer = {
             ctx.fillStyle = "#000000";
             ctx.fill();
 
-            color = this.config.teamColor[planet.owner];
+            let color = this.config.teamColor[planet.owner];
             if (highlight_this_planet) {
                 color = this.config.teamColor_highlight[planet.owner];
             }
@@ -201,14 +203,13 @@ const Visualizer = {
             ctx.arc(display_x, this.canvas.height - display_y, this.config.planet_pixels[planet.growthRate], 0, Math.PI * 2, true);
             ctx.closePath();
             ctx.fillStyle = color;
-            // TODO: highlight planet when a fleet has reached them
             ctx.fill();
 
             ctx.fillStyle = "#ffffff";
             if (highlight_this_planet) {
                 ctx.fillText(z, display_x, this.canvas.height - display_y - 5);
                 ctx.fillText(planet.numShips + " (+" + planet.growthRate + ")",
-                    display_x, this.canvas.height - display_y + 10);
+                             display_x, this.canvas.height - display_y + 10);
             } else {
                 ctx.fillText(planet.numShips, display_x, this.canvas.height - display_y + 5);
             }
@@ -217,7 +218,7 @@ const Visualizer = {
 
         // Draw Fleets
         this.ctx.font = this.config.fleet_font;
-        for (i = 0; i < fleets.length; i++) {
+        for (let i = 0; i < fleets.length; i++) {
             const fleet = fleets[i];
 
             numShips[fleet.owner - 1] += fleet.numShips;
@@ -228,15 +229,15 @@ const Visualizer = {
             display_x = this.unitToPixel(fleet.x) + this.config.offset[0];
             display_y = this.unitToPixel(fleet.y) + this.config.offset[1];
 
-            color = this.config.teamColor[fleet.owner];
+            let color = this.config.teamColor[fleet.owner];
             if (this.active_planet >= 0
-                && (this.active_planet == fleet.destination_id
-                    || this.active_planet == fleet.source_id)) {
+                    && (this.active_planet == fleet.destination_id || this.active_planet == fleet.source_id)) {
                 color = this.config.teamColor_highlight[fleet.owner];
             }
 
             // Draw ship
             ctx.fillStyle = color;
+
             ctx.beginPath();
             ctx.save();
             ctx.translate(display_x, this.canvas.height - display_y);
@@ -245,17 +246,18 @@ const Visualizer = {
             ctx.scale(scale, scale);
 
             let angle = Math.PI / 2 - Math.atan(
-                (fleet.source.y - fleet.destination.y) /
-                (fleet.source.x - fleet.destination.x)
+                (fleet.source.y - fleet.destination.y) / (fleet.source.x - fleet.destination.x)
             );
+
             if (fleet.source.x - fleet.destination.x < 0) {
                 angle = angle - Math.PI;
             }
+
             ctx.rotate(angle);
 
-            ctx.moveTo(0, -10);
-            ctx.lineTo(40, -30);
-            ctx.lineTo(0, 100);
+            ctx.moveTo(  0, -10);
+            ctx.lineTo( 40, -30);
+            ctx.lineTo(  0, 100);
             ctx.lineTo(-40, -30);
             ctx.closePath();
             ctx.fill();
@@ -265,7 +267,7 @@ const Visualizer = {
 
             // Draw text
             if (this.config.showFleetText === true) {
-                angle = -1 * (angle + Math.PI / 2); // switch the axis around a little
+                angle = -1 * (angle + Math.PI / 2); // Switch the axis around a little
                 display_x += -11 * Math.cos(angle);
                 display_y += -11 * Math.sin(angle) - 5;
                 ctx.fillText(fleet.numShips, display_x, this.canvas.height - display_y);
@@ -276,10 +278,10 @@ const Visualizer = {
 
         $(this.canvas).trigger('drawn');
 
-        // update move indicator on chart
+        // Update move indicator on chart
         this.drawChart(frame);
 
-        // update status next to usernames
+        // Update status next to usernames
         $('.player1Name').html(
             // '<a href="profile.php?user_id=' + Visualizer.playerIds[0] + '">' +
             '<a>' + Visualizer.players[0] + '</a><br />' + numShips[0] + ' (+' + production[0] + ')');
@@ -292,13 +294,11 @@ const Visualizer = {
     },
 
     drawChart: function (frame) {
-        let j;
-        let i;
         const canvas = document.getElementById('chart');
         const ctx = canvas.getContext('2d');
         ctx.lineWidth = 1.3;
 
-        // this allows us to restore scale and translate
+        // This allows us to restore scale and translate
         ctx.restore();
         ctx.save();
 
@@ -309,25 +309,28 @@ const Visualizer = {
         // Total the ship counts
         let mostShips = 100;
         let mostProduction = 5;
-        for (i = 0; i < this.moves.length; i++) {
+        for (let i = 0; i < this.moves.length; i++) {
             const turn = this.moves[i];
+
             turn.shipCount = [0, 0, 0];
             turn.prodCount = [0, 0, 0];
-            for (j = 0; j < turn.moving.length; j++) {
+
+            for (let j = 0; j < turn.moving.length; j++) {
                 const fleet = turn.moving[j];
                 turn.shipCount[fleet.owner] += fleet.numShips
             }
-            for (j = 0; j < turn.planets.length; j++) {
+
+            for (let j = 0; j < turn.planets.length; j++) {
                 const planet = turn.planets[j];
                 turn.shipCount[planet.owner] += planet.numShips;
                 turn.prodCount[planet.owner] += this.planets[j].growthRate;
             }
 
-            for (j = 0; j < turn.shipCount.length; j++) {
+            for (let j = 0; j < turn.shipCount.length; j++) {
                 mostShips = Math.max(mostShips, turn.shipCount[j])
             }
 
-            for (j = 0; j < turn.prodCount.length; j++) {
+            for (let j = 0; j < turn.prodCount.length; j++) {
                 mostProduction = Math.max(mostProduction, turn.prodCount[j])
             }
         }
@@ -335,41 +338,37 @@ const Visualizer = {
         // Draw production graph
         let heightFactor = canvas.height / mostProduction / 1.05;
         let widthFactor = canvas.width / Math.max(200, this.moves.length);
-        for (i = 1; i <= 2; i++) {
+        for (let i = 1; i <= 2; i++) {
             ctx.strokeStyle = this.config.planetColor[i];
             ctx.fillStyle = this.config.planetColor[i];
             ctx.beginPath();
             ctx.moveTo(0, this.moves[0].prodCount[i] * heightFactor);
-            for (j = 1; j < this.moves.length; j++) {
+            for (let j = 1; j < this.moves.length; j++) {
                 const prodCount = this.moves[j].prodCount[i];
                 ctx.lineTo(j * widthFactor, prodCount * heightFactor)
             }
             ctx.stroke();
 
             ctx.beginPath();
-            //ctx.arc((j-1)*widthFactor, prodCount*heightFactor, 2, 0, Math.PI*2, true);
-            //ctx.fill();
         }
 
         heightFactor = canvas.height / mostShips / 1.05;
         widthFactor = canvas.width / Math.max(200, this.moves.length);
-        for (i = 1; i <= 2; i++) {
+        for (let i = 1; i <= 2; i++) {
             ctx.strokeStyle = this.config.teamColor[i];
             ctx.fillStyle = this.config.teamColor[i];
             ctx.beginPath();
             ctx.moveTo(0, this.moves[0].shipCount[i] * heightFactor);
-            for (j = 1; j < this.moves.length; j++) {
+            for (let j = 1; j < this.moves.length; j++) {
                 const shipCount = this.moves[j].shipCount[i];
                 ctx.lineTo(j * widthFactor, shipCount * heightFactor)
             }
             ctx.stroke();
 
             ctx.beginPath();
-            //ctx.arc((j-1)*widthFactor, shipCount*heightFactor, 2, 0, Math.PI*2, true);
-            //ctx.fill();
         }
 
-        // draw move indicator
+        // Draw move indicator
         if (typeof frame != "undefined") {
             widthFactor = canvas.width / Math.max(200, this.moves.length);
             ctx.strokeStyle = "#666666";
@@ -395,13 +394,10 @@ const Visualizer = {
     },
 
     run: function () {
+        if (this.frame >= Visualizer.moves.length) this.stop();
         if (!this.playing) return;
-        this.frameDrawStarted = new Date().getTime();
 
-        if (this.frame >= Visualizer.moves.length) {
-            this.stop();
-            return;
-        }
+        this.frameDrawStarted = new Date().getTime();
         this.drawFrame(this.frame);
 
         let frameAdvance = (this.frameDrawStarted - this.frameDrawEnded) / (1000 / this.config.turnsPerSecond);
@@ -412,8 +408,7 @@ const Visualizer = {
         this.frame += Math.min(1, Math.max(this.frameSpeed, frameAdvance));
         this.frameDrawEnded = new Date().getTime();
 
-
-        // Todo: If frameAdvance is the minimum size (on a super fast system), then
+        // TODO: If frameAdvance is the minimum size (on a super fast system), then
         // we need to delay drawing the next frame.
         const timeToNextDraw = 1;
         setTimeout(function () {
@@ -502,12 +497,12 @@ const Visualizer = {
     },
 
     updateActivePlanet: function (x, y) {
-        let new_active_planet = -1;
         x = this.pixelToUnit(x - this.config.offset[0]);
         y = this.pixelToUnit(y - this.config.offset[1]);
-        let z;
+
+        let new_active_planet = -1;
         for (let i = this.planets.length - 1; i >= 0; --i) {
-            z = this.planetZOrder[i];
+            let z = this.planetZOrder[i];
             const planet = this.planets[z];
             const size = this.pixelToUnit(this.config.planet_pixels[planet.growthRate]);
             const dx = x - planet.x;
@@ -586,11 +581,11 @@ const Visualizer = {
 
 
     const speeddownAction = function () {
-        Visualizer.changeSpeed(-0.05);
+        Visualizer.changeSpeed(0.618);
         return false;
     };
     const speedupAction = function () {
-        Visualizer.changeSpeed(0.05);
+        Visualizer.changeSpeed(1.618);
         return false;
     };
 
@@ -645,7 +640,7 @@ const Visualizer = {
     });
 
     display.bind('drawn', function () {
-        $('#turnCounter').text('Turn: ' + Math.floor(Visualizer.frame + 1) + ' of ' + Visualizer.moves.length)
+        $('#turnCounter').text('Turn: ' + Math.floor(Visualizer.frame) + ' of ' + (Visualizer.moves.length - 1))
     });
 
     $('#error_message').text(Visualizer.error_message).css({'color': Visualizer.config.teamColor[1]});
