@@ -9,7 +9,7 @@ def generate(data, save_path):
     with open(template_path, "r") as template:
         content = template.read()
 
-    php_re = re.compile(r"<\?php\?>", re.S)
+    php_re = re.compile(r"<\? php \?>", re.S)
     javascript = "const data = '%s';" % data
     content = php_re.sub(javascript, content)
 
