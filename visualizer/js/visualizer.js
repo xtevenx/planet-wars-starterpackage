@@ -59,6 +59,7 @@ const Visualizer = {
     active_planet: -1,
     shipCount: [0, 0, 0],
     growthRate: [0, 0, 0],
+    // See comment in this.switchPlanetZOrder() about how planetZOrder works.
     planetZOrder: [], // defined in setup()
     config: {
         planet_font: 'bold 14px Arial,Helvetica',
@@ -92,6 +93,10 @@ const Visualizer = {
             if (p.y > max_coords.y) max_coords.y = p.y;
             if (p.y < min_coords.y) min_coords.y = p.y;
         }
+
+        this.planetZOrder.sort((p, q) => {
+            return this.planets[q].growthRate - this.planets[p].growthRate;
+        });
 
         let ranges = [max_coords.x - min_coords.x, max_coords.y - min_coords.y];
         let range = Math.max(...ranges);
@@ -169,8 +174,14 @@ const Visualizer = {
         // Draw Planets
         ctx.font = this.config.planet_font;
         ctx.textAlign = 'center';
-        for (let i = 0; i < this.planets.length; i++) {
+
+        const activePlanet = this.planetZOrder[this.planets.length];
+        for (let i = 0; i < this.planetZOrder.length; i++) {
             const z = this.planetZOrder[i];
+            if (z == activePlanet && i < this.planets.length) {
+                continue;
+            }
+
             const planet = this.planets[z];
             planet.owner = planetStats[z].owner;
             planet.numShips = planetStats[z].numShips;
@@ -474,7 +485,7 @@ const Visualizer = {
         if (data.length < 2) {
             return // No turns.
         }
-        const turns = data[1].split(':').slice(0, -1);
+        const turns = data[1].split(':');
         for (let i = 0; i < turns.length; i++) {
             const turn = turns[i].split(',');
             const move = {};
@@ -515,10 +526,17 @@ const Visualizer = {
     },
 
     switchPlanetZOrder: function (id) {
+        // this.planetZOrder can be one longer than the number of planets.
+        // This is done to efficiently keep the sorted order of planets.
+        // If some planet is active, then the value of the last element in the
+        // array is set to be that planet's id.
+        // Therefore, the array has length exactly the number of planets if and
+        // only if there is no active planet, otherwise, it is exactly one
+        // longer than the number of planets.
         if (id !== -1) {
-            const z = this.planetZOrder.indexOf(id);
-            this.planetZOrder.splice(z, 1);
-            this.planetZOrder.push(id);
+            this.planetZOrder[this.planets.length] = id;
+        } else if (this.planetZOrder.length > this.planets.length) {
+            this.planetZOrder.pop();
         }
     },
 
@@ -529,7 +547,6 @@ const Visualizer = {
 (function ($) {
     Visualizer.setup(data);
 
-    // Hook buttons
     const playAction = function () {
         if (!Visualizer.playing) {
             if (Visualizer.frame > Visualizer.moves.length - 2) {
@@ -632,6 +649,12 @@ const Visualizer = {
         Visualizer.updateActivePlanet(x, display.height() - y);
         return false;
     });
+
+    display.mouseleave(function(evt) {
+        // This should never be a planet due to the margins on the display.
+        Visualizer.updateActivePlanet(0, 0);
+        return false;
+    })
 
     display.bind('drawn', function () {
         $('#turnCounter').text('Turn: ' + Math.floor(Visualizer.frame) + ' of ' + (Visualizer.moves.length - 1))
