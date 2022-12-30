@@ -407,7 +407,12 @@ const Visualizer = {
     },
 
     run: function () {
-        if (this.frame >= Visualizer.moves.length) this.stop();
+        if (this.frame > Visualizer.moves.length - 1) {
+            this.frame = Visualizer.moves.length - 1;
+            this.drawFrame(this.frame);
+            this.stop();
+        }
+
         if (!this.playing) return;
 
         this.frameDrawStarted = new Date().getTime();
@@ -421,11 +426,8 @@ const Visualizer = {
         setTimeout(function () { Visualizer.run.apply(Visualizer); }, 0);
     },
 
-    setFrame: function (targetFrame, wholeNumber) {
-        if (wholeNumber === true) {
-            targetFrame = Math.floor(targetFrame);
-        }
-        this.frame = Math.max(0, Math.min(this.moves.length - 1, targetFrame));
+    setFrame: function (targetFrame) {
+        this.frame = Math.max(0, Math.min(this.moves.length - 1, Math.floor(targetFrame)));
     },
 
     parseData: function (input) {
@@ -568,14 +570,14 @@ const Visualizer = {
     });
 
     $('#end-button').click(function () {
-        Visualizer.setFrame(Visualizer.moves.length - 1, true);
+        Visualizer.setFrame(Visualizer.moves.length - 1);
         Visualizer.drawFrame(Visualizer.frame);
         Visualizer.stop();
         return false;
     });
 
     const prevAction = function () {
-        Visualizer.setFrame(Visualizer.frame - 1, true);
+        Visualizer.setFrame(Visualizer.frame - 1);
         Visualizer.drawFrame(Visualizer.frame);
         Visualizer.stop();
         return false;
