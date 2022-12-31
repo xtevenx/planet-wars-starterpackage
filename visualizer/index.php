@@ -37,7 +37,6 @@
             </p>
 
             <p>
-                <br><br>
                 <canvas id="chart" width="640" height="100"></canvas>
             </p>
         </div>
