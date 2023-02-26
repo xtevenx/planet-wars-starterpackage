@@ -123,8 +123,17 @@ def play_game(
         except queue.Empty:
             p2_timeout = True
 
-        p1_timeout = p1_timeout or p1_thread.had_error
-        p2_timeout = p2_timeout or p2_thread.had_error
+        if p1_thread.had_error or p2_thread.had_error:
+            if p1_thread.had_error and p2_thread.had_error:
+                result.winner = 0
+                result.reason = "Both players had errors."
+            elif p1_thread.had_error:
+                result.winner = 2
+                result.reason = "Player 1 had errors."
+            else:
+                result.winner = 1
+                result.reason = "Player 2 had errors."
+            break
 
         if p1_timeout or p2_timeout:
             if p1_timeout and p2_timeout:
