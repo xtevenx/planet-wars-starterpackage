@@ -22,13 +22,15 @@ class Player:
                  command: str,
                  stdin_handler: HANDLER_TYPE = nothing_handler,
                  stdout_handler: HANDLER_TYPE = nothing_handler,
-                 stderr_handler: HANDLER_TYPE = nothing_handler) -> None:
+                 stderr_handler: HANDLER_TYPE = nothing_handler,
+                 **kwargs) -> None:
 
         self._process = subprocess.Popen(args=shlex.split(command),
                                          stdin=subprocess.PIPE,
                                          stdout=subprocess.PIPE,
                                          stderr=subprocess.PIPE,
-                                         universal_newlines=True)
+                                         universal_newlines=True,
+                                         **kwargs)
 
         self._stdin_handler: HANDLER_TYPE = stdin_handler
         self._stdout_handler: HANDLER_TYPE = stdout_handler

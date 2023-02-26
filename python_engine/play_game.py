@@ -67,13 +67,15 @@ def add_moves(pw: planet_wars.PlanetWars, move_list: list[str],
 
 
 def play_game(
-        map_path: str,
-        turn_time: float,
-        max_turns: int,
-        p1_command: str,
-        p2_command: str,
-        p1_handler: player.HANDLER_TYPE = player.nothing_handler,
-        p2_handler: player.HANDLER_TYPE = player.nothing_handler
+    map_path: str,
+    turn_time: float,
+    max_turns: int,
+    p1_command: str,
+    p2_command: str,
+    p1_cwd: str | None = None,
+    p2_cwd: str | None = None,
+    p1_handler: player.HANDLER_TYPE = player.nothing_handler,
+    p2_handler: player.HANDLER_TYPE = player.nothing_handler,
 ) -> GameResult:
     """Play a game of Planet Wars!
 
@@ -81,6 +83,9 @@ def play_game(
 
     p1_command and p2_command should be shell commands starting the two players
     respectively.
+
+    p1_cwd and p2_cwd are the working directories in which to run p1_command
+    and p2_command respectively.
 
     p1_handler and p2_handler are passed as stderr handlers for the two players
     respectively. They can take a string (a line of stderr for some game agent)
@@ -90,10 +95,12 @@ def play_game(
     if not (pw := init_planet_wars(map_path)):
         return GameResult(reason="Map file not found.")
 
-    if not (player_one := init_player(p1_command, stderr_handler=p1_handler)):
+    if not (player_one := init_player(
+            p1_command, cwd=p1_cwd, stderr_handler=p1_handler)):
         return GameResult(reason="Unable to start player one.")
 
-    if not (player_two := init_player(p2_command, stderr_handler=p2_handler)):
+    if not (player_two := init_player(
+            p2_command, cwd=p2_cwd, stderr_handler=p2_handler)):
         return GameResult(reason="Unable to start player_two")
 
     p1_thread = player.PlayerThread(player_one)
