@@ -1,5 +1,6 @@
 import queue
 import sys
+import threading
 import time
 
 import planet_wars
@@ -53,8 +54,7 @@ def init_player(*args, **kwargs) -> player.Player | None:
         return None
 
 
-def add_moves(pw: planet_wars.PlanetWars, move_list: list[str],
-              owner: int) -> str | None:
+def add_moves(pw: planet_wars.PlanetWars, move_list: list[str], owner: int) -> str | None:
     """Add a set of moves to a PlanetWars instance.
 
     Returns a line if there was an error trying to add that fleet."""
@@ -64,6 +64,18 @@ def add_moves(pw: planet_wars.PlanetWars, move_list: list[str],
             assert pw.add_fleet(owner, *map(int, move_string.split()))
         except (ValueError, TypeError, AssertionError):
             return move_string
+
+
+def _turn_function(thread, turn_time):
+
+    def f(r):
+        try:
+            r['output'] = thread.output_queue.get(timeout=turn_time)
+            r['timeout'] = thread.output_time - thread.input_time > turn_time
+        except queue.Empty:
+            r['timeout'] = True
+
+    return f
 
 
 def play_game(
@@ -105,23 +117,21 @@ def play_game(
         p1_thread.input_queue.put(pw.get_state())
         p2_thread.input_queue.put(pw.get_state(invert=True))
 
-        turn_end = time.perf_counter() + TIMEOUT_LEEWAY
+        p1_return = {}
+        p2_return = {}
 
-        try:
-            block_duration = max(TIMEOUT_LEEWAY,
-                                 turn_end - time.perf_counter())
-            p1_output = p1_thread.output_queue.get(timeout=block_duration)
-            p1_timeout = p1_thread.output_time - p1_thread.input_time > turn_time
-        except queue.Empty:
-            p1_timeout = True
+        p1 = threading.Thread(target=_turn_function(p1_thread, turn_time), args=(p1_return, ))
+        p2 = threading.Thread(target=_turn_function(p2_thread, turn_time), args=(p2_return, ))
+        p1.start()
+        p2.start()
 
-        try:
-            block_duration = max(TIMEOUT_LEEWAY,
-                                 turn_end - time.perf_counter())
-            p2_output = p2_thread.output_queue.get(timeout=block_duration)
-            p2_timeout = p2_thread.output_time - p2_thread.input_time > turn_time
-        except queue.Empty:
-            p2_timeout = True
+        p1.join()
+        p2.join()
+
+        p1_timeout = p1_return['timeout']
+        p2_timeout = p2_return['timeout']
+        p1_output = p1_return['output']
+        p2_output = p2_return['output']
 
         if p1_thread.had_error or p2_thread.had_error:
             if p1_thread.had_error and p2_thread.had_error:
@@ -205,18 +215,12 @@ if __name__ == "__main__":
     import argparse
 
     parser = argparse.ArgumentParser("Play a Planet Wars game.")
-    parser.add_argument("map_path",
-                        action="store",
-                        type=str,
-                        help="path to the map file.")
+    parser.add_argument("map_path", action="store", type=str, help="path to the map file.")
     parser.add_argument("turn_time",
                         action="store",
                         type=float,
                         help="maximum seconds for each turn.")
-    parser.add_argument("max_turns",
-                        action="store",
-                        type=int,
-                        help="maximum number of turns.")
+    parser.add_argument("max_turns", action="store", type=int, help="maximum number of turns.")
     parser.add_argument("player_one",
                         action="store",
                         type=str,
