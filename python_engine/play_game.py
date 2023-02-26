@@ -1,7 +1,6 @@
 import queue
 import sys
 import threading
-import time
 
 import planet_wars
 import player
@@ -130,8 +129,6 @@ def play_game(
 
         p1_timeout = p1_return['timeout']
         p2_timeout = p2_return['timeout']
-        p1_output = p1_return['output']
-        p2_output = p2_return['output']
 
         if p1_thread.had_error or p2_thread.had_error:
             if p1_thread.had_error and p2_thread.had_error:
@@ -156,6 +153,9 @@ def play_game(
                 result.winner = 1
                 result.reason = "Player 2 timed out."
             break
+
+        p1_output = p1_return['output']
+        p2_output = p2_return['output']
 
         p1_illegal_move = add_moves(pw, p1_output, 1)
         p2_illegal_move = add_moves(pw, p2_output, 2)

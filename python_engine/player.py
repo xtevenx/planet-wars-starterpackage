@@ -125,6 +125,13 @@ class PlayerThread(threading.Thread):
                 if line == "go":
                     break
 
+                try:
+                    src, dst, num = tuple(map(int, line.split()))
+                    assert src != dst and num > 0
+                except Exception:
+                    self.player.stop()
+                    raise OSError from None
+
                 output_list.append(line)
         except OSError:
             self.had_error = True
